@@ -19,7 +19,7 @@ if ($_SESSION['role'] !== 'admin') {
 <!-- [Head] start -->
 
 <head>
-    <title>SIMKBS</title>
+    <title>SIKDES</title>
     <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta

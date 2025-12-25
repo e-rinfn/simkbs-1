@@ -71,7 +71,7 @@ if (isset($_POST['login'])) {
 <!-- [Head] start -->
 
 <head>
-  <title>irveena</title>
+  <title>SIKDES</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -81,7 +81,7 @@ if (isset($_POST['login'])) {
   <meta name="author" content="CodedThemes">
 
   <!-- [Favicon] icon -->
-  <link rel="icon" type="image/x-icon" href="<?= $base_url ?>/assets/img/Logo.png" />
+  <link rel="icon" type="image/x-icon" href="<?= $base_url ?>/assets/img/LogoKBS.png" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
   <!-- [Tabler Icons] https://tablericons.com -->
   <link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css">
