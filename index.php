@@ -1,673 +1,1527 @@
-<html lang="en">
+<?php
+session_start();
+?>
+<!DOCTYPE html>
+<html lang="id">
 
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>KBS - Kependudukan dan Bantuan Sosisal</title>
-    <meta content="" name="description">
-    <meta content="" name="keywords">
-    <link rel="shortcut icon" href="./asset_user/img/logo-campur.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Kependudukan Desa</title>
 
-    <!-- Favicons -->
-    <!-- <link href="assets/img/favicon.png" rel="icon"> -->
-    <!-- <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon"> -->
-
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Vendor CSS Files -->
-    <link href="./asset_user/vendor/aos/aos.css" rel="stylesheet">
-    <link href="./asset_user/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="./asset_user/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="./asset_user/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="./asset_user/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-    <link href="./asset_user/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-    <link href="./asset_user/css/fontawesome-free-5.15.3-web/css/fontawesome.min.css" rel="stylesheet">
-    <link href="./asset_user/vendor/slick/slick-theme.css" rel="stylesheet">
-    <link rel="stylesheet" href="./plugins/fontawesome-free/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-color: #f8f9fa;
+            --dark-color: #2c3e50;
+            --gray-color: #95a5a6;
+        }
 
-    <!-- DataTables -->
-    <link rel="stylesheet" href="./plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="./plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <!-- Template Main CSS File -->
-    <link href="./asset_user/css/style.css" rel="stylesheet">
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
 
-    <!-- =======================================================
-  * Template Name: Ninestars - v4.1.0
-  * Template URL: https://bootstrapmade.com/ninestars-free-bootstrap-3-theme-for-creative/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            padding: 10px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            color: var(--primary-color) !important;
+            font-weight: 500;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--secondary-color) !important;
+        }
+
+        .btn-login {
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 25px;
+            padding: 8px 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: white;
+            padding: 180px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover;
+            background-position: center bottom;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 100px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            color: var(--primary-color);
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray-color);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Card Styles */
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+        }
+
+        .info-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .card-icon.primary {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .card-icon.success {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .card-icon.warning {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+        }
+
+        .card-icon.danger {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--accent-color);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .card-text {
+            color: var(--gray-color);
+            margin-bottom: 20px;
+        }
+
+        .stat-number-card {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Chart/Progress Styles */
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar {
+            border-radius: 5px;
+        }
+
+        /* Dusun Section */
+        .dusun-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .dusun-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .dusun-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--secondary-color), #1a2980);
+            color: white;
+        }
+
+        .dusun-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .dusun-population {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: #f8f9fa;
+        }
+
+        .contact-info {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            height: 100%;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(52, 152, 219, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+        }
+
+        .contact-details h4 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        .contact-details p {
+            color: var(--gray-color);
+        }
+
+        .map-container {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            height: 100%;
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            border: none;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        .footer h5 {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            color: white;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero-title {
+                font-size: 2.8rem;
+            }
+
+            .section {
+                padding: 80px 0;
+            }
+
+            .section-title h2 {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .hero-stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+
+            .navbar-collapse {
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                margin-top: 15px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-section {
+                padding: 150px 0 80px;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .section {
+                padding: 60px 0;
+            }
+        }
+    </style>
 </head>
 
-<body data-aos-easing="ease-in-out" data-aos-duration="1000" data-aos-delay="0"><!-- ======= Header ======= -->
-    <header id="header" class="fixed-top d-flex align-items-center">
-        <div class="container d-flex align-items-center justify-content-between">
-
-            <div class="logo">
-                <h1 class="text-light">
-                    <a href="index.html">
-                        <img src="./asset_user/img/logo-putih.png" alt="logo">
-                        <small>SIKDES</small>
-                    </a>
-                </h1>
-                <!-- Uncomment below if you prefer to use an image logo -->
-                <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
-            </div>
-
-            <nav id="navbar" class="navbar">
-                <ul>
-                    <li><a class="nav-link scrollto active" href="#hero">Beranda</a></li>
-                    <li><a class="nav-link scrollto" href="#about">Administrasi</a></li>
-                    <li class="dropdown"><a href="#"><span>Kependudukan</span> <i class="bi bi-chevron-down"></i></a>
-                        <ul>
-                            <li><a href="#Demografi">Demografi Penduduk</a></li>
-                            <li><a href="#Pendidikan">Pendidikan</a></li>
-                            <li><a href="#Pekerjaan">Pekerjaan</a></li>
-                            <li><a href="#Kelompok">Kelompok Umur</a></li>
-                            <li><a href="#Agama">Agama</a></li>
-                            <li><a href="#Dusun">Dusun</a></li>
-                        </ul>
-                    </li>
-                    <li><a class="nav-link scrollto" href="#contact">Kontak</a></li>
-                    <li><a class="getstarted scrollto" href="./auth/login.php">Login</a></li>
-                </ul>
-                <i class="bi bi-list mobile-nav-toggle"></i>
-            </nav><!-- .navbar -->
-
-        </div>
-    </header><!-- End Header -->
-
-    <!-- ======= Hero Section ======= -->
-    <section id="hero" class="d-flex align-items-center">
-
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <div class="row gy-4">
-                <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center">
-                    <h1>Sistem Informasi Kependudukan Desa (SIKDES)</h1>
-                    <p style="text-align: justify;">
-                        Sistem Informasi Kependudukan Desa atau bisa disingkat SIKDES merupakan suatu sistem yang dapat mengolah data kependudukan yang berada di Desa Kurniabakti menjadi Data Klasifikasi kependudukan.
-                    </p>
+            <!-- Logo & Brand -->
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="assets/img/logo-campur.png"
+                    alt="Logo SIKDES"
+                    class="me-2">
+                <span>SIKDES</span>
+            </a>
+
+
+            <!-- Mobile Toggle Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#hero">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#demografi">Demografi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pendidikan">Pendidikan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pekerjaan">Pekerjaan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#umur">Kelompok Umur</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#agama">Agama</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#dusun">Dusun</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#kontak">Kontak</a>
+                    </li>
+                    <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+                        <a href="<?php echo isset($_SESSION['user_id']) ? 'admin/dashboard.php' : 'auth/login.php'; ?>" class="btn btn-login">
+                            <?php echo isset($_SESSION['user_id']) ? 'Dashboard' : 'Login'; ?>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1 class="hero-title">Sistem Informasi Kependudukan Desa</h1>
+                        <p class="hero-subtitle">
+                            Sistem Informasi Kependudukan Desa atau bisa disingkat SIKDES merupakan
+                            suatu sistem yang dapat mengolah data kependudukan yang berada di Desa Kurniabakti
+                            menjadi Data Klasifikasi kependudukan..
+                        </p>
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">15,234</span>
+                                <span class="stat-label">Jiwa</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">4,209</span>
+                                <span class="stat-label">Keluarga</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">8</span>
+                                <span class="stat-label">Dusun</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-lg-6 order-1 order-lg-2 hero-img">
-                    <img src="./asset_user/img/test 1@4x-8.png" class="img-fluid animated" alt="">
+                <div class="col-lg-6">
+                    <div class="text-center">
+                        <img src="https://via.placeholder.com/500x400/1a2980/26d0ce?text=Ilustrasi+Kependudukan"
+                            alt="Ilustrasi Kependudukan"
+                            class="img-fluid rounded-3 shadow-lg"
+                            style="max-width: 90%;">
+                    </div>
                 </div>
             </div>
         </div>
-    </section><!-- End Hero -->
+    </section>
 
-    <main id="main" style="padding-top: 150px;">
-
-        <!-- ======= Kependudukan ======= -->
-
-        <!-- demo grafipenduduk -->
-        <section id="Demografi" class="services section-bg">
-            <div class="container aos-init aos-animate" data-aos="fade-up">
-
-                <div class="section-title">
-                    <h2>Infografis Kependudukan</h2>
-                    <p>Demografi Penduduk </p>
-                </div>
-
-                <div class="row justify-content-center">
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/laki@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Laki-laki</a></h4>
-                            <p class="description">Jumlah laki-laki yang berada di Desa Kurniabakti adalah <b>5</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="200">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/perempuan@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Perempuan</a></h4>
-                            <p class="description">Jumlah perempuan yang berada di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="300">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/total@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Total</a></h4>
-                            <p class="description">Jumlah total laki-laki dan perempuan yang berada di Desa Kurniabakti adalah <b>6</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                </div>
-
+    <!-- Demografi Section -->
+    <section id="demografi" class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Infografis Kependudukan Demografi</h2>
+                <p>Data statistik kependudukan berdasarkan jenis kelamin dan status perkawinan</p>
             </div>
-        </section>
-        <!-- akhir Demografi Penduduk -->
 
-        <!-- Pendidikan -->
-        <section id="Pendidikan" class="services section-bg">
-            <div class="container aos-init aos-animate" data-aos="fade-up">
-
-                <div class="section-title">
-                    <h2>Infografis Kependudukan</h2>
-                    <p>Pendidikan</p>
-                </div>
-
-                <div class="row justify-content-center">
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/belumsekolah@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Belum Sekolah</a></h4>
-                            <p class="description">Jumlah penduduk yang belum sekolah di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
+            <div class="row g-4">
+                <!-- Card 1: Total Penduduk -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-users"></i>
                         </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/putussekolah@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Tidak Tamat SD</a></h4>
-                            <p class="description">Jumlah penduduk yang tidak tamat SD di Desa Kurniabakti adalah <b>3</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/sd_1@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Tamat SD/Sederajat</a></h4>
-                            <p class="description">Jumlah penduduk yang tamat SD/Sederajat di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/smp@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">SLTP/Sederajat</a></h4>
-                            <p class="description">Jumlah penduduk yang tamat SLTP/Sederajat di Desa Butu adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/sma@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">SLTA/Sederajat</a></h4>
-                            <p class="description">Jumlah penduduk yang tamat SLTA/Sederajat di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/study/d3@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Diploma 1-3</a></h4>
-                            <p class="description">Jumlah penduduk yang Diploma 1-3 di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/study/s1@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Strata 1</a></h4>
-                            <p class="description">Jumlah penduduk yang Strata 1 di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/study/s2@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Strata 2</a></h4>
-                            <p class="description">Jumlah penduduk yang Strata 2 di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/study/s3@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Strata 3</a></h4>
-                            <p class="description">Jumlah penduduk yang Strata di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </section>
-        <!-- Akhir pendidikan -->
-
-
-
-        <!-- Pekerjaan -->
-
-        <section id="Pekerjaan" class="services section-bg">
-            <div class="container aos-init aos-animate" data-aos="fade-up">
-
-                <div class="section-title">
-                    <h2>Infografis Kependudukan</h2>
-                    <p>Pekerjaan</p>
-                </div>
-
-
-                <div class="row justify-content-center">
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/belumberkerja@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Belum/Tidak Berkerja</a></h4>
-                            <p class="description">Jumlah penduduk yang belum/tidak berkerja di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/petani.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">Petani/Pekebun</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai Petani/Pekebun di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/buruh_tani.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">Buruh Tani</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai Buruh Tani di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/buruh_kebun.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">Buruh Perkebunan</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai Buruh Perkebunan di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/buruh_bangunan.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">Buruh Bangunan</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai Buruh Bangunan di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/nelayan.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">Nelayan</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai Nelayan di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/pedagang.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">Pedagang Kecil</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai Pedagang di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/pedagang.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">Pedagang Besar</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai Pedagang di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/industry.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">Industri</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai Industri di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/guru.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">Guru</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai Guru di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/pns.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">PNS</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai PNS di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/pensiunan.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">Pensiunan</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai Pensiunan di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/perangkat_desa.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">Perangkat Desa</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai Perangkat Desa di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/job/TKI.png" alt="" class="mt-3 mb-4" width="50%"></div>
-                            <h4 class="title"><a href="">TKI</a></h4>
-                            <p class="description">Jumlah penduduk yang berkerja sebagai TKI di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </section>
-
-        <!-- Akhir Pekerjaan -->
-
-
-        <!-- Kelompok umur -->
-
-        <section id="Kelompok" class="services section-bg">
-            <div class="container aos-init aos-animate" data-aos="fade-up">
-
-                <div class="section-title">
-                    <h2>Infografis Kependudukan</h2>
-                    <p>Kelompok Umur</p>
-                </div>
-
-
-                <div class="row justify-content-center">
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/bayi_1@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Bayi</a></h4>
-                            <p class="description">Jumlah bayi yang berada di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/anak@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Anak-anak</a></h4>
-                            <p class="description">Jumlah anak-anak yang berada di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/remaja_1@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Remaja</a></h4>
-                            <p class="description">Jumlah remaja yang berada di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/dewasa_1@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Dewasa</a></h4>
-                            <p class="description">Jumlah orang dewasa yang berada adi Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/orang tua_1@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Lansia</a></h4>
-                            <p class="description">Jumlah orang tua yang berada di Desa Kurniabakti adalah <b>2</b> Jiwa</p>
-                        </div>
+                        <h5 class="card-title">Total Penduduk</h5>
+                        <span class="stat-number-card">15,234</span>
+                        <p class="card-text">Jiwa terdaftar dalam sistem</p>
                     </div>
                 </div>
 
-            </div>
-        </section>
-
-        <!-- end kelopok umur   -->
-
-
-        <!-- Agama -->
-        <section id="Agama" class="services section-bg">
-            <div class="container aos-init aos-animate" data-aos="fade-up">
-
-                <div class="section-title">
-                    <h2>Infografis Kependudukan</h2>
-                    <p>Agama</p>
-                </div>
-
-
-                <div class="row justify-content-center">
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/religion/islam.png" alt="" class="p-3" width="50%"></div>
-                            <h4 class="title"><a href="">Islam</a></h4>
-                            <p class="description">Jumlah orang yang memeluk agama Islam di Desa Kurniabakti adalah <b>5</b> Jiwa</p>
+                <!-- Card 2: Laki-laki -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-male"></i>
                         </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/religion/christian.png" alt="" class="p-3" width="50%"></div>
-                            <h4 class="title"><a href="">Kristen</a></h4>
-                            <p class="description">Jumlah orang yang memeluk agama Kristen di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/religion/christian.png" alt="" class="p-3" width="50%"></div>
-                            <h4 class="title"><a href="">Katolik</a></h4>
-                            <p class="description">Jumlah orang yang memeluk agama Kristen di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon">
-                                <img src="./asset_user/img/4x/religion/buddhism.png" alt="" class="p-3" width="50%">
+                        <h5 class="card-title">Laki-laki</h5>
+                        <span class="stat-number-card">7,512</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>49.3%</span>
                             </div>
-                            <h4 class="title"><a href="">Budha</a></h4>
-                            <p class="description">Jumlah orang yang memeluk agama Kristen di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/religion/hinduism.png" alt="" class="p-3" width="50%"></div>
-                            <h4 class="title"><a href="">Hindu</a></h4>
-                            <p class="description">Jumlah orang yang memeluk agama Kristen di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/religion/confucianism.png" alt="" class="p-3" width="50%"></div>
-                            <h4 class="title"><a href="">Khonghucu</a></h4>
-                            <p class="description">Jumlah orang yang memeluk agama Kristen di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- end agama -->
-
-
-        <!-- Dusun -->
-
-        <section id="Dusun" class="services section-bg">
-            <div class="container aos-init aos-animate" data-aos="fade-up">
-
-                <div class="section-title">
-                    <h2>Infografis Kependudukan</h2>
-                    <p>Dusun</p>
-                </div>
-
-                <div class="row justify-content-center">
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Leles Tengah</a></h4>
-                            <p class="description">
-                                Jumlah penduduk yang berada di Leles Tengah di Desa Kurniabakti adalah
-                                <b>
-                                    2 </b>
-                                Jiwa
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Leles Hilir</a></h4>
-                            <p class="description">
-                                Jumlah penduduk yang berada di Leles Hilir di Desa Kurniabakti adalah
-                                <b>
-                                    2 </b>
-                                Jiwa
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Sukarasa</a></h4>
-                            <p class="description">
-                                Jumlah penduduk yang berada di Sukarasa di Desa Kurniabakti adalah
-                                <b>
-                                    2 </b>
-                                Jiwa
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Sindangtamu</a></h4>
-                            <p class="description">
-                                Jumlah penduduk yang berada di Sindangtamu di Desa Kurniabakti adalah
-                                <b>
-                                    0 </b>
-                                Jiwa
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                        <div class="icon-box">
-                            <div class="icon"><img src="./asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
-                            <h4 class="title"><a href="">Asem</a></h4>
-                            <p class="description">
-                                Jumlah penduduk yang berada di Asem di Desa Kurniabakti adalah
-                                <b>
-                                    0 </b>
-                                Jiwa
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- end dusun -->
-
-        <!-- End Kependudukan -->
-
-
-        <!-- ======= Contact Us Section ======= -->
-        <section id="contact" class="contact">
-            <div class="container aos-init aos-animate" data-aos="fade-up">
-
-                <div class="section-title">
-                    <h2>Hubungi Kami</h2>
-                    <p>Hubungi kami untuk memulai</p>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-12 aos-init aos-animate" data-aos="fade-up" data-aos-delay="100">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="info">
-                                    <div class="address">
-                                        <i class="bi bi-geo-alt"></i>
-                                        <h4>Lokasi:</h4>
-                                        <p>Jl. Kapten Suradimadja Dalam No. 110 Kurniabakti Kec. Ciawi Kab. Tasikmalaya</p>
-                                    </div>
-
-                                    <div class="email">
-                                        <i class="bi bi-envelope"></i>
-                                        <h4>Email:</h4>
-                                        <p>desakurniabakti@gmail.com</p>
-                                    </div>
-                                </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: 49.3%"></div>
                             </div>
-                            <div class="col-md-8">
-                                <div class="info">
-                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6030.8861991248905!2d108.13779914456798!3d-7.156542216617176!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6f4eaa8785249d%3A0x17bdb61a5a113357!2sKantor%20Kepala%20Desa%20Kurniabakti!5e1!3m2!1sid!2sid!4v1762078226643!5m2!1sid!2sid" width="275" height="200" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" "=""></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Perempuan -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon danger">
+                            <i class="fas fa-female"></i>
+                        </div>
+                        <h5 class="card-title">Perempuan</h5>
+                        <span class="stat-number-card">7,722</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>50.7%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="background-color: #e74c3c; width: 50.7%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Status Perkawinan -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon success">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h5 class="card-title">Status Perkawinan</h5>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Kawin</span>
+                                <span>68%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 68%"></div>
+                            </div>
+
+                            <div class="progress-label mt-3">
+                                <span>Belum Kawin</span>
+                                <span>25%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 25%"></div>
+                            </div>
+
+                            <div class="progress-label mt-3">
+                                <span>Janda/Duda</span>
+                                <span>7%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-secondary" style="width: 7%"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
-    </section><!-- End Contact Us Section -->
+    </section>
 
-</main><!-- End #main -->
+    <!-- Pendidikan Section -->
+    <section id="pendidikan" class="section" style="background-color: #f8f9fa;">
+        <div class="container">
+            <div class="section-title">
+                <h2>Infografis Tingkat Pendidikan</h2>
+                <p>Distribusi penduduk berdasarkan jenjang pendidikan terakhir</p>
+            </div>
 
- <!-- ======= Footer ======= -->
- <footer id=" footer">
+            <div class="row g-4">
+                <!-- SD -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h5 class="card-title">SD/Sederajat</h5>
+                        <span class="stat-number-card">4,890</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>32.1%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 32.1%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- SMP -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-school"></i>
+                        </div>
+                        <h5 class="card-title">SMP/Sederajat</h5>
+                        <span class="stat-number-card">3,567</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>23.4%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 23.4%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                                        <div class="container py-3">
-                                            <div class="copyright pt-1">
-                                                © Copyright <strong><span>KBS</span></strong>. All Rights Reserved
-                                            </div>
-                                            <div class="credits  pt-1">
-                                                <!-- All the links in the footer should remain intact. -->
-                                                <!-- You can delete the links only if you purchased the pro version. -->
-                                                <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                                                <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/ninestars-free-bootstrap-3-theme-for-creative/ -->
-                                                <b>Versi</b> <a href="https://bootstrapmade.com/">1.0</a>
-                                            </div>
-                                        </div>
-                                        </footer><!-- End Footer -->
+                <!-- SMA -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon success">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <h5 class="card-title">SMA/Sederajat</h5>
+                        <span class="stat-number-card">3,245</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>21.3%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 21.3%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                                        <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+                <!-- Perguruan Tinggi -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h5 class="card-title">Perguruan Tinggi</h5>
+                        <span class="stat-number-card">1,872</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>12.3%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: 12.3%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                                        <!-- Vendor JS Files -->
-                                        <script src="./plugins/jquery/jquery.min.js"></script>
-                                        <script src="./asset_user/vendor/aos/aos.js"></script>
-                                        <script src="./asset_user/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-                                        <script src="./asset_user/vendor/glightbox/js/glightbox.min.js"></script>
-                                        <script src="./asset_user/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-                                        <script src="./asset_user/vendor/php-email-form/validate.js"></script>
-                                        <script src="./asset_user/vendor/swiper/swiper-bundle.min.js"></script>
-                                        <script src="./asset_user/vendor/slick/slick.min.js"></script>
+                <!-- Tidak Sekolah -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h5 class="card-title">Tidak/Belum Sekolah</h5>
+                        <span class="stat-number-card">1,660</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>10.9%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-secondary" style="width: 10.9%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                                        <!-- DataTables -->
-                                        <script src="./plugins/datatables/jquery.dataTables.min.js"></script>
-                                        <script src="./plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-                                        <script src="./plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-                                        <script src="./plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- Pekerjaan Section -->
+    <section id="pekerjaan" class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Infografis Pekerjaan</h2>
+                <p>Distribusi pekerjaan utama penduduk usia produktif</p>
+            </div>
 
-                                        <!-- Template Main JS File -->
-                                        <script src="./asset_user/js/main.js"></script>
+            <div class="row g-4">
+                <!-- Petani -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon success">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <h5 class="card-title">Petani</h5>
+                        <span class="stat-number-card">3,245</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>31.2%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 31.2%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                                        <script>
-                                            $("#example1").DataTable({
-                                                "responsive": true,
-                                                "autoWidth": false,
-                                            });
+                <!-- Wiraswasta -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <h5 class="card-title">Wiraswasta</h5>
+                        <span class="stat-number-card">2,567</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>24.7%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 24.7%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                                            $("input[name=pencarian]:radio").click(function() {
-                                                if ($('input[name=pencarian]:checked').val() == "rekomendasi") {
-                                                    $('.pencek').attr("Disabled", true);
-                                                } else if ($('input[name=pencarian]:checked').val() == "penerima") {
-                                                    $('.pencek').attr("Disabled", false);
-                                                }
-                                            });
-                                        </script>
+                <!-- PNS -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5 class="card-title">PNS/TNI/POLRI</h5>
+                        <span class="stat-number-card">987</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>9.5%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: 9.5%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Buruh -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-hard-hat"></i>
+                        </div>
+                        <h5 class="card-title">Buruh</h5>
+                        <span class="stat-number-card">1,234</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>11.9%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="background-color: #8e44ad; width: 11.9%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Pelajar/Mahasiswa -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h5 class="card-title">Pelajar/Mahasiswa</h5>
+                        <span class="stat-number-card">1,567</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>15.1%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: 15.1%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Lainnya -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon secondary">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                        <h5 class="card-title">Lainnya</h5>
+                        <span class="stat-number-card">789</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>7.6%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-secondary" style="width: 7.6%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Kelompok Umur Section -->
+    <section id="umur" class="section" style="background-color: #f8f9fa;">
+        <div class="container">
+            <div class="section-title">
+                <h2>Infografis Kelompok Umur</h2>
+                <p>Distribusi penduduk berdasarkan kelompok usia</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- 0-14 Tahun -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-baby"></i>
+                        </div>
+                        <h5 class="card-title">0-14 Tahun</h5>
+                        <span class="stat-number-card">3,456</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>22.7%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: 22.7%"></div>
+                            </div>
+                        </div>
+                        <p class="card-text">Anak-anak dan remaja awal</p>
+                    </div>
+                </div>
+
+                <!-- 15-64 Tahun -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon success">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h5 class="card-title">15-64 Tahun</h5>
+                        <span class="stat-number-card">10,123</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>66.5%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 66.5%"></div>
+                            </div>
+                        </div>
+                        <p class="card-text">Usia produktif</p>
+                    </div>
+                </div>
+
+                <!-- 65+ Tahun -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <h5 class="card-title">65+ Tahun</h5>
+                        <span class="stat-number-card">1,655</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>10.8%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="background-color: #8e44ad; width: 10.8%"></div>
+                            </div>
+                        </div>
+                        <p class="card-text">Lansia</p>
+                    </div>
+                </div>
+
+                <!-- Rata-rata Umur -->
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5 class="card-title">Rata-rata Umur</h5>
+                        <span class="stat-number-card">32.5 Tahun</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Usia Median</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <p class="card-text">Mayoritas penduduk berada dalam usia produktif</p>
+                    </div>
+                </div>
+
+                <!-- Kepadatan Penduduk -->
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <div class="card-icon danger">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h5 class="card-title">Kepadatan Penduduk</h5>
+                        <span class="stat-number-card">1,245/km²</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Kepadatan sedang</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="background-color: #e74c3c; width: 75%"></div>
+                            </div>
+                        </div>
+                        <p class="card-text">Distribusi merata di seluruh wilayah desa</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agama Section -->
+    <section id="agama" class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Infografis Agama</h2>
+                <p>Distribusi penduduk berdasarkan agama yang dianut</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Islam -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-mosque"></i>
+                        </div>
+                        <h5 class="card-title">Islam</h5>
+                        <span class="stat-number-card">12,345</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>81.0%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: 81%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kristen -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-church"></i>
+                        </div>
+                        <h5 class="card-title">Kristen</h5>
+                        <span class="stat-number-card">1,567</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>10.3%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 10.3%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Katolik -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-cross"></i>
+                        </div>
+                        <h5 class="card-title">Katolik</h5>
+                        <span class="stat-number-card">876</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>5.8%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="background-color: #8e44ad; width: 5.8%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hindu -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon danger">
+                            <i class="fas fa-om"></i>
+                        </div>
+                        <h5 class="card-title">Hindu</h5>
+                        <span class="stat-number-card">234</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>1.5%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="background-color: #e74c3c; width: 1.5%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buddha -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon success">
+                            <i class="fas fa-yin-yang"></i>
+                        </div>
+                        <h5 class="card-title">Buddha</h5>
+                        <span class="stat-number-card">156</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>1.0%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 1%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Konghucu -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-torii-gate"></i>
+                        </div>
+                        <h5 class="card-title">Konghucu</h5>
+                        <span class="stat-number-card">56</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>0.4%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-secondary" style="width: 0.4%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dusun Section -->
+    <section id="dusun" class="section" style="background-color: #f8f9fa;">
+        <div class="container">
+            <div class="section-title">
+                <h2>Infografis Dusun</h2>
+                <p>Distribusi penduduk berdasarkan dusun di wilayah desa</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Dusun 1 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Krajan</h5>
+                        <div class="dusun-population">2,345</div>
+                        <p>Jiwa • 425 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-primary" style="width: 15.4%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 2 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Sumber</h5>
+                        <div class="dusun-population">2,123</div>
+                        <p>Jiwa • 389 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-success" style="width: 13.9%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 3 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-water"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Kaligondo</h5>
+                        <div class="dusun-population">1,987</div>
+                        <p>Jiwa • 356 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-warning" style="width: 13.0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 4 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-mountain"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Gunungsari</h5>
+                        <div class="dusun-population">1,845</div>
+                        <p>Jiwa • 332 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar" style="background-color: #8e44ad; width: 12.1%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 5 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-sun"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Surya</h5>
+                        <div class="dusun-population">1,723</div>
+                        <p>Jiwa • 312 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-info" style="width: 11.3%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 6 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Tani</h5>
+                        <div class="dusun-population">1,645</div>
+                        <p>Jiwa • 298 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-success" style="width: 10.8%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 7 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-fish"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Mina</h5>
+                        <div class="dusun-population">1,512</div>
+                        <p>Jiwa • 274 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-primary" style="width: 9.9%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 8 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Bintang</h5>
+                        <div class="dusun-population">1,432</div>
+                        <p>Jiwa • 260 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-warning" style="width: 9.4%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="kontak" class="section contact-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Hubungi Kami</h2>
+                <p>Silakan hubungi kami untuk informasi lebih lanjut</p>
+            </div>
+
+            <div class="row g-5">
+                <!-- Contact Information -->
+                <div class="col-lg-5">
+                    <div class="contact-info">
+                        <h3 class="mb-4">Kantor Desa</h3>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Alamat</h4>
+                                <p>
+                                    Jl. Kapten Suradimadja Dalam <br>
+                                    No. 110 Kurniabakti<br>
+                                    Kecamatan Ciawi, Kabupaten Tasikmalaya
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Telepon</h4>
+                                <p>(021) 1234-5678<br>
+                                    0812-3456-7890</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Email</h4>
+                                <p>desakurniabakti@gmail.com</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Jam Operasional</h4>
+                                <p>Senin - Jumat: 08:00 - 16:00<br>
+                                    Sabtu: 08:00 - 12:00<br>
+                                    Minggu & Hari Libur: Tutup</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h5 class="mb-3">Sosial Media</h5>
+                            <div class="d-flex gap-3">
+                                <a href="#" class="btn btn-primary btn-sm">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="btn btn-info btn-sm">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="btn btn-danger btn-sm">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="#" class="btn btn-success btn-sm">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map -->
+                <div class="col-lg-7">
+                    <div class="map-container">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d40948.12031820083!2d108.142776!3d-7.157106!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6f4eaa8785249d%3A0x17bdb61a5a113357!2sKantor%20Kepala%20Desa%20Kurniabakti!5e1!3m2!1sid!2sid!4v1766666754364!5m2!1sid!2sid"
+                            allowfullscreen=""
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5>SIKDES</h5>
+                    <p>Sistem Informasi Kependudukan Desa yang terintegrasi untuk pengelolaan data penduduk yang akurat dan efisien.</p>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Menu</h5>
+                    <ul class="footer-links">
+                        <li><a href="#hero">Beranda</a></li>
+                        <li><a href="#demografi">Demografi</a></li>
+                        <li><a href="#pendidikan">Pendidikan</a></li>
+                        <li><a href="#pekerjaan">Pekerjaan</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Menu</h5>
+                    <ul class="footer-links">
+                        <li><a href="#umur">Kelompok Umur</a></li>
+                        <li><a href="#agama">Agama</a></li>
+                        <li><a href="#dusun">Dusun</a></li>
+                        <li><a href="#kontak">Kontak</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5>Kontak</h5>
+                    <p><i class="fas fa-map-marker-alt me-2"></i> Jl. Kapten Suradimadja Dalam No. 110 Kurniabakti Kec. Ciawi Kab. Tasikmalaya</p>
+                    <p><i class="fas fa-phone me-2"></i> (021) 1234-5678</p>
+                    <p><i class="fas fa-envelope me-2"></i> desakurniabakti@gmail.com</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; <?php echo date('Y'); ?> SIKDES - Sistem Informasi Kependudukan Desa.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+
+                    // Update active nav link
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Update active nav link on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            let current = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+
+                if (scrollY >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Initialize animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animated');
+                }
+            });
+        }, observerOptions);
+
+        // Observe cards for animation
+        document.querySelectorAll('.info-card, .dusun-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Animate counter numbers (contoh implementasi)
+        function animateCounter(element, target, duration = 2000) {
+            const start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = Math.floor(target).toLocaleString();
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current).toLocaleString();
+                }
+            }, 16);
+        }
+
+        // Initialize counters when in view
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('.stat-number-card, .stat-number, .dusun-population');
+                    counters.forEach(counter => {
+                        const target = parseInt(counter.textContent.replace(/,/g, ''));
+                        if (!isNaN(target)) {
+                            animateCounter(counter, target);
+                        }
+                    });
+                }
+            });
+        }, {
+            threshold: 0.5
+        });
+
+        // Observe sections with counters
+        document.querySelectorAll('section').forEach(section => {
+            counterObserver.observe(section);
+        });
+    </script>
 </body>
 
 </html>

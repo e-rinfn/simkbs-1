@@ -2,6 +2,6 @@
 .env
 /vendor
 /node_modules
-# composer.json
-# composer.lock
+composer.json
+composer.lock
 simkbs_fix.sql
