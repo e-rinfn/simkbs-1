@@ -6,7 +6,7 @@
     <title>KBS - Kependudukan dan Bantuan Sosisal</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
-    <link rel="shortcut icon" href="http://localhost/simkbs/asset_user/img/logo-campur.png" type="image/x-icon">
+    <link rel="shortcut icon" href="./asset_user/img/logo-campur.png" type="image/x-icon">
 
     <!-- Favicons -->
     <!-- <link href="assets/img/favicon.png" rel="icon"> -->
@@ -16,22 +16,22 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="http://localhost/simkbs/asset_user/vendor/aos/aos.css" rel="stylesheet">
-    <link href="http://localhost/simkbs/asset_user/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="http://localhost/simkbs/asset_user/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="http://localhost/simkbs/asset_user/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="http://localhost/simkbs/asset_user/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-    <link href="http://localhost/simkbs/asset_user/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-    <link href="http://localhost/simkbs/asset_user/css/fontawesome-free-5.15.3-web/css/fontawesome.min.css" rel="stylesheet">
-    <link href="http://localhost/simkbs/asset_user/vendor/slick/slick-theme.css" rel="stylesheet">
-    <link rel="stylesheet" href="http://localhost/simkbs/plugins/fontawesome-free/css/all.min.css">
+    <link href="./asset_user/vendor/aos/aos.css" rel="stylesheet">
+    <link href="./asset_user/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./asset_user/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="./asset_user/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="./asset_user/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="./asset_user/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="./asset_user/css/fontawesome-free-5.15.3-web/css/fontawesome.min.css" rel="stylesheet">
+    <link href="./asset_user/vendor/slick/slick-theme.css" rel="stylesheet">
+    <link rel="stylesheet" href="./plugins/fontawesome-free/css/all.min.css">
 
     <!-- DataTables -->
-    <link rel="stylesheet" href="http://localhost/simkbs/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="http://localhost/simkbs/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="./plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="./plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
 
     <!-- Template Main CSS File -->
-    <link href="http://localhost/simkbs/asset_user/css/style.css" rel="stylesheet">
+    <link href="./asset_user/css/style.css" rel="stylesheet">
 
     <!-- =======================================================
   * Template Name: Ninestars - v4.1.0
@@ -48,7 +48,7 @@
             <div class="logo">
                 <h1 class="text-light">
                     <a href="index.html">
-                        <img src="http://localhost/simkbs/asset_user/img/logo-putih.png" alt="logo">
+                        <img src="./asset_user/img/logo-putih.png" alt="logo">
                         <small>SIKDES</small>
                     </a>
                 </h1>
@@ -91,7 +91,7 @@
                     </p>
                 </div>
                 <div class="col-lg-6 order-1 order-lg-2 hero-img">
-                    <img src="http://localhost/simkbs/asset_user/img/test 1@4x-8.png" class="img-fluid animated" alt="">
+                    <img src="./asset_user/img/test 1@4x-8.png" class="img-fluid animated" alt="">
                 </div>
             </div>
         </div>
@@ -113,7 +113,7 @@
                 <div class="row justify-content-center">
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/laki@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/laki@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Laki-laki</a></h4>
                             <p class="description">Jumlah laki-laki yang berada di Desa Kurniabakti adalah <b>5</b> Jiwa</p>
                         </div>
@@ -121,7 +121,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="200">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/perempuan@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/perempuan@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Perempuan</a></h4>
                             <p class="description">Jumlah perempuan yang berada di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -129,7 +129,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="300">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/total@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/total@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Total</a></h4>
                             <p class="description">Jumlah total laki-laki dan perempuan yang berada di Desa Kurniabakti adalah <b>6</b> Jiwa</p>
                         </div>
@@ -153,7 +153,7 @@
                 <div class="row justify-content-center">
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/belumsekolah@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/belumsekolah@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Belum Sekolah</a></h4>
                             <p class="description">Jumlah penduduk yang belum sekolah di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -161,7 +161,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/putussekolah@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/putussekolah@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Tidak Tamat SD</a></h4>
                             <p class="description">Jumlah penduduk yang tidak tamat SD di Desa Kurniabakti adalah <b>3</b> Jiwa</p>
                         </div>
@@ -169,7 +169,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/sd_1@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/sd_1@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Tamat SD/Sederajat</a></h4>
                             <p class="description">Jumlah penduduk yang tamat SD/Sederajat di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -177,7 +177,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/smp@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/smp@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">SLTP/Sederajat</a></h4>
                             <p class="description">Jumlah penduduk yang tamat SLTP/Sederajat di Desa Butu adalah <b>0</b> Jiwa</p>
                         </div>
@@ -185,7 +185,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/sma@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/sma@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">SLTA/Sederajat</a></h4>
                             <p class="description">Jumlah penduduk yang tamat SLTA/Sederajat di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -193,7 +193,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/study/d3@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/study/d3@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Diploma 1-3</a></h4>
                             <p class="description">Jumlah penduduk yang Diploma 1-3 di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -201,7 +201,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/study/s1@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/study/s1@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Strata 1</a></h4>
                             <p class="description">Jumlah penduduk yang Strata 1 di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -209,7 +209,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/study/s2@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/study/s2@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Strata 2</a></h4>
                             <p class="description">Jumlah penduduk yang Strata 2 di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -217,7 +217,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/study/s3@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/study/s3@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Strata 3</a></h4>
                             <p class="description">Jumlah penduduk yang Strata di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -245,7 +245,7 @@
                 <div class="row justify-content-center">
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/belumberkerja@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/belumberkerja@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Belum/Tidak Berkerja</a></h4>
                             <p class="description">Jumlah penduduk yang belum/tidak berkerja di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -253,7 +253,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/petani.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/petani.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">Petani/Pekebun</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai Petani/Pekebun di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -261,7 +261,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/buruh_tani.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/buruh_tani.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">Buruh Tani</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai Buruh Tani di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -269,7 +269,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/buruh_kebun.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/buruh_kebun.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">Buruh Perkebunan</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai Buruh Perkebunan di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -277,7 +277,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/buruh_bangunan.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/buruh_bangunan.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">Buruh Bangunan</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai Buruh Bangunan di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -285,7 +285,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/nelayan.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/nelayan.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">Nelayan</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai Nelayan di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -293,7 +293,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/pedagang.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/pedagang.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">Pedagang Kecil</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai Pedagang di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -301,7 +301,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/pedagang.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/pedagang.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">Pedagang Besar</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai Pedagang di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -309,7 +309,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/industry.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/industry.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">Industri</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai Industri di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -317,7 +317,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/guru.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/guru.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">Guru</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai Guru di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -325,7 +325,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/pns.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/pns.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">PNS</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai PNS di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -333,7 +333,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/pensiunan.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/pensiunan.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">Pensiunan</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai Pensiunan di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -341,7 +341,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/perangkat_desa.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/perangkat_desa.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">Perangkat Desa</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai Perangkat Desa di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -349,7 +349,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/job/TKI.png" alt="" class="mt-3 mb-4" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/job/TKI.png" alt="" class="mt-3 mb-4" width="50%"></div>
                             <h4 class="title"><a href="">TKI</a></h4>
                             <p class="description">Jumlah penduduk yang berkerja sebagai TKI di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -377,7 +377,7 @@
                 <div class="row justify-content-center">
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/bayi_1@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/bayi_1@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Bayi</a></h4>
                             <p class="description">Jumlah bayi yang berada di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -385,7 +385,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/anak@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/anak@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Anak-anak</a></h4>
                             <p class="description">Jumlah anak-anak yang berada di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -393,7 +393,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/remaja_1@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/remaja_1@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Remaja</a></h4>
                             <p class="description">Jumlah remaja yang berada di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -401,7 +401,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/dewasa_1@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/dewasa_1@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Dewasa</a></h4>
                             <p class="description">Jumlah orang dewasa yang berada adi Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -409,7 +409,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/orang tua_1@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/orang tua_1@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Lansia</a></h4>
                             <p class="description">Jumlah orang tua yang berada di Desa Kurniabakti adalah <b>2</b> Jiwa</p>
                         </div>
@@ -435,7 +435,7 @@
                 <div class="row justify-content-center">
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/religion/islam.png" alt="" class="p-3" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/religion/islam.png" alt="" class="p-3" width="50%"></div>
                             <h4 class="title"><a href="">Islam</a></h4>
                             <p class="description">Jumlah orang yang memeluk agama Islam di Desa Kurniabakti adalah <b>5</b> Jiwa</p>
                         </div>
@@ -443,7 +443,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/religion/christian.png" alt="" class="p-3" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/religion/christian.png" alt="" class="p-3" width="50%"></div>
                             <h4 class="title"><a href="">Kristen</a></h4>
                             <p class="description">Jumlah orang yang memeluk agama Kristen di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -451,7 +451,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/religion/christian.png" alt="" class="p-3" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/religion/christian.png" alt="" class="p-3" width="50%"></div>
                             <h4 class="title"><a href="">Katolik</a></h4>
                             <p class="description">Jumlah orang yang memeluk agama Kristen di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -460,7 +460,7 @@
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
                             <div class="icon">
-                                <img src="http://localhost/simkbs/asset_user/img/4x/religion/buddhism.png" alt="" class="p-3" width="50%">
+                                <img src="./asset_user/img/4x/religion/buddhism.png" alt="" class="p-3" width="50%">
                             </div>
                             <h4 class="title"><a href="">Budha</a></h4>
                             <p class="description">Jumlah orang yang memeluk agama Kristen di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
@@ -469,7 +469,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/religion/hinduism.png" alt="" class="p-3" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/religion/hinduism.png" alt="" class="p-3" width="50%"></div>
                             <h4 class="title"><a href="">Hindu</a></h4>
                             <p class="description">Jumlah orang yang memeluk agama Kristen di Desa Kurniabakti adalah <b>0</b> Jiwa</p>
                         </div>
@@ -477,7 +477,7 @@
 
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/religion/confucianism.png" alt="" class="p-3" width="50%"></div>
+                            <div class="icon"><img src="./asset_user/img/4x/religion/confucianism.png" alt="" class="p-3" width="50%"></div>
                             <h4 class="title"><a href="">Khonghucu</a></h4>
                             <p class="description">Jumlah orang yang memeluk agama Kristen di Desa Kurniabakti adalah <b>1</b> Jiwa</p>
                         </div>
@@ -503,7 +503,7 @@
                 <div class="row justify-content-center">
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Leles Tengah</a></h4>
                             <p class="description">
                                 Jumlah penduduk yang berada di Leles Tengah di Desa Kurniabakti adalah
@@ -515,7 +515,7 @@
                     </div>
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Leles Hilir</a></h4>
                             <p class="description">
                                 Jumlah penduduk yang berada di Leles Hilir di Desa Kurniabakti adalah
@@ -527,7 +527,7 @@
                     </div>
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Sukarasa</a></h4>
                             <p class="description">
                                 Jumlah penduduk yang berada di Sukarasa di Desa Kurniabakti adalah
@@ -539,7 +539,7 @@
                     </div>
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Sindangtamu</a></h4>
                             <p class="description">
                                 Jumlah penduduk yang berada di Sindangtamu di Desa Kurniabakti adalah
@@ -551,7 +551,7 @@
                     </div>
                     <div class="col-md-6 col-lg-3 d-flex align-items-stretch aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
                         <div class="icon-box">
-                            <div class="icon"><img src="http://localhost/simkbs/asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
+                            <div class="icon"><img src="./asset_user/img/4x/dusun_1@4x-8.png" alt=""></div>
                             <h4 class="title"><a href="">Asem</a></h4>
                             <p class="description">
                                 Jumlah penduduk yang berada di Asem di Desa Kurniabakti adalah
@@ -633,23 +633,23 @@
                                         <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
                                         <!-- Vendor JS Files -->
-                                        <script src="http://localhost/simkbs/plugins/jquery/jquery.min.js"></script>
-                                        <script src="http://localhost/simkbs/asset_user/vendor/aos/aos.js"></script>
-                                        <script src="http://localhost/simkbs/asset_user/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-                                        <script src="http://localhost/simkbs/asset_user/vendor/glightbox/js/glightbox.min.js"></script>
-                                        <script src="http://localhost/simkbs/asset_user/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-                                        <script src="http://localhost/simkbs/asset_user/vendor/php-email-form/validate.js"></script>
-                                        <script src="http://localhost/simkbs/asset_user/vendor/swiper/swiper-bundle.min.js"></script>
-                                        <script src="http://localhost/simkbs/asset_user/vendor/slick/slick.min.js"></script>
+                                        <script src="./plugins/jquery/jquery.min.js"></script>
+                                        <script src="./asset_user/vendor/aos/aos.js"></script>
+                                        <script src="./asset_user/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+                                        <script src="./asset_user/vendor/glightbox/js/glightbox.min.js"></script>
+                                        <script src="./asset_user/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+                                        <script src="./asset_user/vendor/php-email-form/validate.js"></script>
+                                        <script src="./asset_user/vendor/swiper/swiper-bundle.min.js"></script>
+                                        <script src="./asset_user/vendor/slick/slick.min.js"></script>
 
                                         <!-- DataTables -->
-                                        <script src="http://localhost/simkbs/plugins/datatables/jquery.dataTables.min.js"></script>
-                                        <script src="http://localhost/simkbs/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-                                        <script src="http://localhost/simkbs/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-                                        <script src="http://localhost/simkbs/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+                                        <script src="./plugins/datatables/jquery.dataTables.min.js"></script>
+                                        <script src="./plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+                                        <script src="./plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+                                        <script src="./plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
 
                                         <!-- Template Main JS File -->
-                                        <script src="http://localhost/simkbs/asset_user/js/main.js"></script>
+                                        <script src="./asset_user/js/main.js"></script>
 
                                         <script>
                                             $("#example1").DataTable({
