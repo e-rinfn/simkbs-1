@@ -92,13 +92,35 @@ $pdf->AddPage();
 // Font
 $pdf->SetFont('helvetica', '', 10);
 
-// Header
-$pdf->SetFont('helvetica', 'B', 14);
-$pdf->Cell(0, 8, 'LAPORAN DATA KONDISI RUMAH', 0, 1, 'C');
+// Header dengan Logo
+$pdf->SetFont('helvetica', 'B', 16);
 
-$pdf->SetFont('helvetica', '', 10);
-$pdf->Cell(0, 5, 'Desa Kurnia Bakti, Kecamatan Contoh, Kabupaten Contoh', 0, 1, 'C');
-$pdf->Cell(0, 5, 'Telp: 0812-3456-7890 | Email: desacontoh@email.com', 0, 1, 'C');
+// Path logo (sesuaikan dengan lokasi logo Anda)
+$logoPath = __DIR__ . '/../../assets/img/LogoKBS.png'; // Ganti dengan path logo Anda
+
+// Cek apakah logo ada
+if (file_exists($logoPath)) {
+    // Tambahkan logo di kiri atas
+    $pdf->Image($logoPath, 10, 10, 25); // x=10, y=10, width=25
+
+    // Pindahkan posisi untuk judul di kanan logo
+    $pdf->SetXY(40, 10); // Mulai dari 40mm dari kiri (10+25+5)
+    $pdf->Cell(0, 10, 'LAPORAN DATA KONDISI RUMAH', 0, 1);
+
+    // Informasi desa di bawah judul
+    $pdf->SetXY(40, $pdf->GetY() + 1);
+    $pdf->SetFont('helvetica', '', 10);
+    $pdf->Cell(0, 5, 'Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya', 0, 1);
+
+    $pdf->SetXY(40, $pdf->GetY());
+    $pdf->Cell(0, 5, 'Telp: (0265) 123456 | Email: desakurniabakti@email.com', 0, 1);
+} else {
+    // Jika logo tidak ada, tampilkan header biasa
+    $pdf->Cell(0, 10, 'LAPORAN DATA KONDISI RUMAH', 0, 1, 'C');
+    $pdf->SetFont('helvetica', '', 10);
+    $pdf->Cell(0, 5, 'Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya', 0, 1, 'C');
+    $pdf->Cell(0, 5, 'Telp: (0265) 123456 | Email: desakurniabakti@email.com', 0, 1, 'C');
+}
 
 // Garis pemisah
 $pdf->Line(10, $pdf->GetY(), $pdf->GetPageWidth() - 10, $pdf->GetY());
@@ -124,7 +146,7 @@ $filter_text = !empty($filter_info) ? 'Filter: ' . implode(', ', $filter_info) :
 
 $pdf->SetFont('helvetica', '', 9);
 $pdf->Cell(0, 5, $filter_text, 0, 1);
-$pdf->Cell(0, 5, 'Tanggal Cetak: ' . date('d/m/Y H:i:s'), 0, 1);
+$pdf->Cell(0, 5, 'Tanggal Cetak: ' . dateIndo(date('Y-m-d H:i:s')), 0, 1);
 $pdf->Cell(0, 5, 'Total Data: ' . number_format($total_data) . ' rumah', 0, 1);
 $pdf->Ln(3);
 
@@ -193,11 +215,43 @@ foreach ($data_rumah as $rumah) {
     $pdf->Ln();
 }
 
-// Footer
+// Footer dengan TTD sederhana
 $pdf->Ln(10);
+
+// Garis pemisah
+$pdf->Line(10, $pdf->GetY(), $pdf->GetPageWidth() - 10, $pdf->GetY());
+$pdf->Ln(5);
+
+// Hitung posisi untuk TTD
+$pageWidth = $pdf->GetPageWidth();
+$ttdX = $pageWidth - 80; // 80mm dari kiri untuk TTD
+
+// Posisi untuk TTD
+$pdf->SetX($ttdX);
+
+// TTD di sebelah kanan
 $pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(0, 5, '--- Laporan ini dicetak secara otomatis ---', 0, 1, 'C');
-$pdf->Cell(0, 5, 'Copyright © ' . date('Y') . ' Desa Contoh', 0, 1, 'C');
+$pdf->Cell(70, 5, 'Mengetahui,', 0, 1, 'C');
+$pdf->SetX($ttdX);
+$pdf->Cell(70, 15, '', 0, 1, 'C'); // Space untuk tanda tangan
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(70, 5, 'KEPALA DESA KURNIABAKTI', 0, 1, 'C');
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', 'BU', 10);
+$pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', '', 9);
+$pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
+
+// Informasi laporan di bagian bawah
+$pdf->Ln(10);
+$pdf->SetFont('helvetica', 'I', 8);
+$pdf->Cell(0, 5, '--- Laporan ini dicetak secara otomatis dari Sistem Administrasi Desa Kurniabakti ---', 0, 1, 'C');
+$pdf->Cell(0, 5, 'Halaman ' . $pdf->PageNo(), 0, 1, 'C');
 
 // Output PDF ke browser
 $filename = 'laporan_kondisi_rumah_' . date('Ymd_His') . '.pdf';

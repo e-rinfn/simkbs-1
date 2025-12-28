@@ -253,5 +253,114 @@ function log_aktivitas($user_id, $aktivitas, $modul, $aksi, $data_id = null)
     return $conn->query($sql);
 }
 
+/**
+ * Fungsi untuk memotong string dengan menghormati kata
+ * @param string $string String yang akan dipotong
+ * @param int $length Panjang maksimum
+ * @param string $ellipsis Karakter elipsis
+ * @return string String yang sudah dipotong
+ */
+function smartTruncate($string, $length = 50, $ellipsis = '...')
+{
+    if (strlen($string) <= $length) {
+        return $string;
+    }
+
+    // Coba potong pada spasi terdekat
+    $truncated = substr($string, 0, $length);
+    $lastSpace = strrpos($truncated, ' ');
+
+    if ($lastSpace !== false) {
+        return substr($truncated, 0, $lastSpace) . $ellipsis;
+    }
+
+    // Jika tidak ada spasi, potong langsung
+    return $truncated . $ellipsis;
+}
+
+/**
+ * Fungsi khusus untuk memotong dusun tanpa memotong kata
+ * @param string $dusun Nama dusun
+ * @param int $maxLength Panjang maksimum
+ * @return string Nama dusun yang sudah dipotong
+ */
+function truncateDusun($dusun, $maxLength = 10)
+{
+    if (strlen($dusun) <= $maxLength) {
+        return $dusun;
+    }
+
+    // Untuk dusun, kita prioritaskan menjaga kata lengkap
+    $words = explode(' ', $dusun);
+    $result = '';
+
+    foreach ($words as $word) {
+        if (strlen($result . ' ' . $word) <= $maxLength) {
+            $result .= ($result ? ' ' : '') . $word;
+        } else {
+            break;
+        }
+    }
+
+    // Jika masih terlalu panjang setelah menjaga kata, potong dengan smart truncate
+    if (strlen($result) > $maxLength || empty($result)) {
+        return smartTruncate($dusun, $maxLength, '');
+    }
+
+    return $result;
+}
+
+/**
+ * Fungsi khusus untuk memotong hubungan keluarga
+ * @param string $hubkel Hubungan keluarga
+ * @param int $maxLength Panjang maksimum
+ * @return string Hubungan keluarga yang dipendekkan
+ */
+function truncateHubKeluarga($hubkel, $maxLength = 8)
+{
+    // Mapping untuk singkatan
+    $mapping = [
+        'KEPALA KELUARGA' => 'Kepala',
+        'SUAMI' => 'Suami',
+        'ISTRI' => 'Istri',
+        'ANAK' => 'Anak',
+        'MENANTU' => 'Menantu',
+        'CUCU' => 'Cucu',
+        'ORANGTUA' => 'Ortu',
+        'MERTUA' => 'Mertua',
+        'FAMILI LAIN' => 'Famili',
+        'PEMBANTU' => 'Pembantu',
+        'LAINNYA' => 'Lain'
+    ];
+
+    // Cek apakah ada di mapping
+    if (isset($mapping[$hubkel])) {
+        return $mapping[$hubkel];
+    }
+
+    // Jika tidak, gunakan smart truncate
+    return smartTruncate($hubkel, $maxLength, '');
+}
+
+/**
+ * Format KK/NIK untuk PDF
+ * @param string $string KK atau NIK
+ * @return string Format dengan spasi setiap 4 digit
+ */
+function formatKKNIKPDF($string)
+{
+    if (empty($string)) return '';
+    // Hapus semua karakter non-digit
+    $string = preg_replace('/[^0-9]/', '', $string);
+    // Format dengan spasi setiap 4 digit
+    return chunk_split($string, 4, ' ');
+}
+
+/**
+ * Format tanggal Indonesia untuk PDF
+ * @param string $date Tanggal dalam format Y-m-d
+ * @return string Tanggal dalam format d/m/Y
+ */
+
 // Muat variabel lingkungan dari file .env
 loadEnv();

@@ -78,12 +78,35 @@ $pdf->AddPage();
 // Set font
 $pdf->SetFont('helvetica', '', 10);
 
-// Header
+// Header dengan Logo
 $pdf->SetFont('helvetica', 'B', 16);
-$pdf->Cell(0, 10, 'KLASIFIKASI DATA PENDUDUK', 0, 1, 'C');
 
-$pdf->SetFont('helvetica', '', 10);
-$pdf->Cell(0, 5, 'Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya', 0, 1, 'C');
+// Path logo (sesuaikan dengan lokasi logo Anda)
+$logoPath = __DIR__ . '/../../assets/img/LogoKBS.png'; // Ganti dengan path logo Anda
+
+// Cek apakah logo ada
+if (file_exists($logoPath)) {
+    // Tambahkan logo di kiri atas
+    $pdf->Image($logoPath, 10, 10, 25); // x=10, y=10, width=25
+
+    // Pindahkan posisi untuk judul di kanan logo
+    $pdf->SetXY(40, 10); // Mulai dari 40mm dari kiri (10+25+5)
+    $pdf->Cell(0, 10, 'LAPORAN DATA KLASIFIKASI PENDUDUK', 0, 1);
+
+    // Informasi desa di bawah judul
+    $pdf->SetXY(40, $pdf->GetY() + 1);
+    $pdf->SetFont('helvetica', '', 10);
+    $pdf->Cell(0, 5, 'Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya', 0, 1);
+
+    $pdf->SetXY(40, $pdf->GetY());
+    $pdf->Cell(0, 5, 'Telp: (0265) 123456 | Email: desakurniabakti@email.com', 0, 1);
+} else {
+    // Jika logo tidak ada, tampilkan header biasa
+    $pdf->Cell(0, 10, 'LAPORAN DATA KLASIFIKASI PENDUDUK', 0, 1, 'C');
+    $pdf->SetFont('helvetica', '', 10);
+    $pdf->Cell(0, 5, 'Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya', 0, 1, 'C');
+    $pdf->Cell(0, 5, 'Telp: (0265) 123456 | Email: desakurniabakti@email.com', 0, 1, 'C');
+}
 
 // Garis pemisah
 $pdf->Line(10, $pdf->GetY(), $pdf->GetPageWidth() - 10, $pdf->GetY());
@@ -133,7 +156,7 @@ foreach ($data_penduduk as $penduduk) {
 $pdf->SetFillColor(240, 240, 240);
 $pdf->SetFont('helvetica', 'B', 9);
 
-$col_widths = [8, 50, 15, 15, 30, 20];
+$col_widths = [8, 150, 30, 30, 30, 30];
 $headers = ['No', 'Dusun', 'RT', 'RW', 'Jenis Kelamin', 'Jumlah'];
 
 foreach ($headers as $i => $header) {
@@ -173,6 +196,37 @@ $pdf->SetFont('helvetica', 'B', 9);
 $pdf->Cell(array_sum($col_widths) - $col_widths[5], 6, 'TOTAL:', 1, 0, 'R');
 $pdf->Cell($col_widths[5], 6, number_format($grand_total), 1, 0, 'C');
 $pdf->Ln(10);
+
+
+// Footer dengan TTD sederhana
+$pdf->Ln(10);
+
+// Hitung posisi untuk TTD
+$pageWidth = $pdf->GetPageWidth();
+$ttdX = $pageWidth - 80; // 80mm dari kiri untuk TTD
+
+// Posisi untuk TTD
+$pdf->SetX($ttdX);
+
+// TTD di sebelah kanan
+$pdf->SetFont('helvetica', '', 9);
+$pdf->Cell(70, 5, 'Mengetahui,', 0, 1, 'C');
+$pdf->SetX($ttdX);
+$pdf->Cell(70, 15, '', 0, 1, 'C'); // Space untuk tanda tangan
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(70, 5, 'KEPALA DESA KURNIABAKTI', 0, 1, 'C');
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', 'BU', 10);
+$pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', '', 9);
+$pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
+
+
 
 // **TABEL 2: Rentang Umur**
 $pdf->AddPage();
@@ -235,7 +289,7 @@ foreach ($data_penduduk as $penduduk) {
 $pdf->SetFillColor(240, 240, 240);
 $pdf->SetFont('helvetica', 'B', 8);
 
-$col_widths_umur = [8, 35];
+$col_widths_umur = [8, 100];
 foreach ($rentang_labels as $label) {
     $col_widths_umur[] = 12;
 }
@@ -294,6 +348,37 @@ foreach ($rentang_labels as $label) {
 $pdf->Cell($col_widths_umur[count($col_widths_umur) - 1], 6, number_format($grand_total_umur), 1, 0, 'C');
 $pdf->Ln(10);
 
+
+// Footer dengan TTD sederhana
+$pdf->Ln(10);
+
+// Hitung posisi untuk TTD
+$pageWidth = $pdf->GetPageWidth();
+$ttdX = $pageWidth - 80; // 80mm dari kiri untuk TTD
+
+// Posisi untuk TTD
+$pdf->SetX($ttdX);
+
+// TTD di sebelah kanan
+$pdf->SetFont('helvetica', '', 9);
+$pdf->Cell(70, 5, 'Mengetahui,', 0, 1, 'C');
+$pdf->SetX($ttdX);
+$pdf->Cell(70, 15, '', 0, 1, 'C'); // Space untuk tanda tangan
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(70, 5, 'KEPALA DESA KURNIABAKTI', 0, 1, 'C');
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', 'BU', 10);
+$pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', '', 9);
+$pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
+
+
+
 // **TABEL 3: Klasifikasi Pekerjaan**
 $pdf->AddPage();
 $pdf->SetFont('helvetica', 'B', 12);
@@ -346,7 +431,7 @@ foreach ($data_penduduk as $penduduk) {
 $pdf->SetFillColor(240, 240, 240);
 $pdf->SetFont('helvetica', 'B', 9);
 
-$col_widths_kerja = [8, 50, 50, 20];
+$col_widths_kerja = [8, 150, 100, 20];
 $headers_kerja = ['No', 'Dusun', 'Pekerjaan', 'Jumlah'];
 
 foreach ($headers_kerja as $i => $header) {
@@ -406,6 +491,35 @@ $pdf->SetFont('helvetica', 'B', 9);
 $pdf->Cell(array_sum($col_widths_kerja) - $col_widths_kerja[3], 6, 'TOTAL SELURUH PEKERJAAN:', 1, 0, 'R');
 $pdf->Cell($col_widths_kerja[3], 6, number_format($grand_total_pekerjaan), 1, 0, 'C');
 
+// Footer dengan TTD sederhana
+$pdf->Ln(10);
+
+// Hitung posisi untuk TTD
+$pageWidth = $pdf->GetPageWidth();
+$ttdX = $pageWidth - 80; // 80mm dari kiri untuk TTD
+
+// Posisi untuk TTD
+$pdf->SetX($ttdX);
+
+// TTD di sebelah kanan
+$pdf->SetFont('helvetica', '', 9);
+$pdf->Cell(70, 5, 'Mengetahui,', 0, 1, 'C');
+$pdf->SetX($ttdX);
+$pdf->Cell(70, 15, '', 0, 1, 'C'); // Space untuk tanda tangan
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(70, 5, 'KEPALA DESA KURNIABAKTI', 0, 1, 'C');
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', 'BU', 10);
+$pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', '', 9);
+$pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
+
+
 // **TABEL 4: Ringkasan Pekerjaan (Total per Kategori)**
 $pdf->AddPage();
 $pdf->SetFont('helvetica', 'B', 12);
@@ -422,7 +536,7 @@ foreach ($pekerjaan_data as $data) {
 $pdf->SetFillColor(240, 240, 240);
 $pdf->SetFont('helvetica', 'B', 9);
 
-$col_widths_ringkasan = [10, 70, 25, 25];
+$col_widths_ringkasan = [10, 215, 25, 25];
 $headers_ringkasan = ['No', 'Kategori Pekerjaan', 'Jumlah', 'Persentase'];
 
 // Header tabel dengan border lengkap
@@ -474,12 +588,36 @@ $pdf->Cell($combined_width, 8, 'TOTAL:', 1, 0, 'R', 1);
 $pdf->Cell($col_widths_ringkasan[2], 8, number_format($total_ringkasan), 1, 0, 'C', 1);
 $pdf->Cell($col_widths_ringkasan[3], 8, '100%', 1, 0, 'C', 1);
 $pdf->Ln();
-// Footer
-$pdf->Ln(15);
-$pdf->SetFont('helvetica', 'I', 8);
-$pdf->Cell(0, 5, 'Data dihitung berdasarkan ' . count($data_penduduk) . ' penduduk', 0, 1);
-$pdf->Cell(0, 5, 'Dicetak secara otomatis dari Sistem Kependudukan', 0, 1);
-$pdf->Cell(0, 5, 'Halaman ' . $pdf->PageNo(), 0, 1);
+
+// Footer dengan TTD sederhana
+$pdf->Ln(10);
+
+
+// Hitung posisi untuk TTD
+$pageWidth = $pdf->GetPageWidth();
+$ttdX = $pageWidth - 80; // 80mm dari kiri untuk TTD
+
+// Posisi untuk TTD
+$pdf->SetX($ttdX);
+
+// TTD di sebelah kanan
+$pdf->SetFont('helvetica', '', 9);
+$pdf->Cell(70, 5, 'Mengetahui,', 0, 1, 'C');
+$pdf->SetX($ttdX);
+$pdf->Cell(70, 15, '', 0, 1, 'C'); // Space untuk tanda tangan
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(70, 5, 'KEPALA DESA KURNIABAKTI', 0, 1, 'C');
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', 'BU', 10);
+$pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', '', 9);
+$pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
+
 
 // Output PDF
 $filename = 'klasifikasi_penduduk_' . date('Ymd_His') . '.pdf';

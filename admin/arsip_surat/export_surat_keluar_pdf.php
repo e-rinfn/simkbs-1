@@ -98,12 +98,35 @@ $pdf->AddPage();
 // Set font
 $pdf->SetFont('helvetica', '', 10);
 
-// Header
+// Header dengan Logo
 $pdf->SetFont('helvetica', 'B', 16);
-$pdf->Cell(0, 10, 'ARSIP SURAT KELUAR', 0, 1, 'C');
 
-$pdf->SetFont('helvetica', '', 10);
-$pdf->Cell(0, 5, 'Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya', 0, 1, 'C');
+// Path logo (sesuaikan dengan lokasi logo Anda)
+$logoPath = __DIR__ . '/../../assets/img/LogoKBS.png'; // Ganti dengan path logo Anda
+
+// Cek apakah logo ada
+if (file_exists($logoPath)) {
+    // Tambahkan logo di kiri atas
+    $pdf->Image($logoPath, 10, 10, 25); // x=10, y=10, width=25
+
+    // Pindahkan posisi untuk judul di kanan logo
+    $pdf->SetXY(40, 10); // Mulai dari 40mm dari kiri (10+25+5)
+    $pdf->Cell(0, 10, 'LAPORAN DATA ARSIP SURAT KELUAR', 0, 1);
+
+    // Informasi desa di bawah judul
+    $pdf->SetXY(40, $pdf->GetY() + 1);
+    $pdf->SetFont('helvetica', '', 10);
+    $pdf->Cell(0, 5, 'Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya', 0, 1);
+
+    $pdf->SetXY(40, $pdf->GetY());
+    $pdf->Cell(0, 5, 'Telp: (0265) 123456 | Email: desakurniabakti@email.com', 0, 1);
+} else {
+    // Jika logo tidak ada, tampilkan header biasa
+    $pdf->Cell(0, 10, 'LAPORAN DATA ARSIP SURAT KELUAR', 0, 1, 'C');
+    $pdf->SetFont('helvetica', '', 10);
+    $pdf->Cell(0, 5, 'Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya', 0, 1, 'C');
+    $pdf->Cell(0, 5, 'Telp: (0265) 123456 | Email: desakurniabakti@email.com', 0, 1, 'C');
+}
 
 // Garis pemisah
 $pdf->Line(10, $pdf->GetY(), $pdf->GetPageWidth() - 10, $pdf->GetY());
@@ -145,7 +168,7 @@ $pdf->Ln(3);
 $pdf->SetFillColor(240, 240, 240);
 $pdf->SetFont('helvetica', 'B', 9);
 
-$col_widths = [8, 40, 30, 45, 70, 20, 20];
+$col_widths = [8, 50, 45, 45, 70, 30, 30];
 $headers = ['No', 'Nomor Surat', 'Tgl Surat', 'Tujuan', 'Perihal', 'Sifat', 'Status'];
 
 foreach ($headers as $i => $header) {
@@ -180,10 +203,39 @@ foreach ($data_surat as $surat) {
     $pdf->Ln();
 }
 
-// Footer
+// Garis pemisah
+$pdf->Line(10, $pdf->GetY(), $pdf->GetPageWidth() - 10, $pdf->GetY());
+$pdf->Ln(5);
+
+// Hitung posisi untuk TTD
+$pageWidth = $pdf->GetPageWidth();
+$ttdX = $pageWidth - 80; // 80mm dari kiri untuk TTD
+
+// Posisi untuk TTD
+$pdf->SetX($ttdX);
+
+// TTD di sebelah kanan
+$pdf->SetFont('helvetica', '', 9);
+$pdf->Cell(70, 5, 'Mengetahui,', 0, 1, 'C');
+$pdf->SetX($ttdX);
+$pdf->Cell(70, 15, '', 0, 1, 'C'); // Space untuk tanda tangan
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(70, 5, 'KEPALA DESA KURNIABAKTI', 0, 1, 'C');
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', 'BU', 10);
+$pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
+
+$pdf->SetX($ttdX);
+$pdf->SetFont('helvetica', '', 9);
+$pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
+
+// Informasi laporan di bagian bawah
 $pdf->Ln(10);
 $pdf->SetFont('helvetica', 'I', 8);
-$pdf->Cell(0, 5, 'Dicetak oleh: ' . ($_SESSION['nama_lengkap'] ?? $_SESSION['username']), 0, 1);
+$pdf->Cell(0, 5, '--- Laporan ini dicetak secara otomatis dari Sistem Administrasi Desa Kurniabakti ---', 0, 1, 'C');
 $pdf->Cell(0, 5, 'Halaman ' . $pdf->PageNo(), 0, 1, 'C');
 
 // Output PDF
