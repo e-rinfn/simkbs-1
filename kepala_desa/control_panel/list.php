@@ -9,7 +9,7 @@ if (!isLoggedIn()) {
 }
 
 // Cek role user
-$allowed_roles = ['admin', 'kades', 'sekretaris'];
+$allowed_roles = ['kepala_desa'];
 if (!in_array($_SESSION['role'], $allowed_roles)) {
     header("Location: {$base_url}auth/role_tidak_cocok.php");
     exit();
@@ -453,11 +453,6 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                             </div>
                                         </form>
                                     </div>
-                                    <div class="col-md-4 text-end">
-                                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">
-                                            <i class="ti ti-plus"></i> Tambah Dusun
-                                        </button>
-                                    </div>
                                 </div>
 
                                 <!-- Info Filter -->
@@ -500,7 +495,6 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                             <th style="width: 25%;">Nama Dusun</th>
                                             <th style="width: 40%;">Keterangan</th>
                                             <th style="width: 25%;">Tanggal Dibuat</th>
-                                            <th style="width: 10%;" class="text-center">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -515,10 +509,6 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                                             <a href="list.php" class="btn btn-outline-primary mt-2">
                                                                 <i class="ti ti-refresh"></i> Reset Filter
                                                             </a>
-                                                        <?php else: ?>
-                                                            <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                                                <i class="ti ti-plus"></i> Tambah Dusun Pertama
-                                                            </button>
                                                         <?php endif; ?>
                                                     </div>
                                                 </td>
@@ -543,28 +533,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                                     <td>
                                                         <?= $created_at ?>
                                                     </td>
-                                                    <!-- Di dalam loop data_dusun -->
-                                                    <td class="text-center">
-                                                        <div class="action-buttons">
-                                                            <button type="button"
-                                                                class="btn btn-primary btn-sm btn-edit"
-                                                                title="Edit"
-                                                                data-bs-toggle="tooltip"
-                                                                data-id="<?= $dusun['id'] ?>"
-                                                                data-dusun="<?= htmlspecialchars($dusun['dusun']) ?>"
-                                                                data-keterangan="<?= htmlspecialchars($dusun['keterangan']) ?>">
-                                                                <i class="ti ti-edit"></i>
-                                                            </button>
-                                                            <?php if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'kades'): ?>
-                                                                <a href="?delete=<?= $dusun['id'] ?>"
-                                                                    class="btn btn-danger btn-sm btn-delete"
-                                                                    title="Hapus"
-                                                                    data-bs-toggle="tooltip">
-                                                                    <i class="ti ti-trash"></i>
-                                                                </a>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                    </td>
+
                                                 </tr>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
@@ -580,121 +549,6 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     </div>
     <!-- [ Main Content ] end -->
 
-    <!-- Modal Tambah Dusun -->
-    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addModalLabel">
-                        <i class="ti ti-plus me-2"></i>Tambah Dusun Baru
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="POST" action="">
-                    <div class="modal-body">
-                        <?php if (!empty($errors['database'])): ?>
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="ti ti-alert-circle me-2"></i>
-                                <?= htmlspecialchars($errors['database']) ?>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        <?php endif; ?>
-
-                        <div class="mb-3">
-                            <label for="dusun" class="form-label required">Nama Dusun</label>
-                            <input type="text"
-                                class="form-control <?= isset($errors['dusun']) ? 'is-invalid' : '' ?>"
-                                id="dusun"
-                                name="dusun"
-                                value="<?= isset($_POST['dusun']) ? htmlspecialchars($_POST['dusun']) : '' ?>"
-                                placeholder="Masukkan nama dusun"
-                                required>
-                            <?php if (isset($errors['dusun'])): ?>
-                                <div class="error-message"><?= $errors['dusun'] ?></div>
-                            <?php endif; ?>
-                            <div class="form-text">
-                                Maksimal 100 karakter. Nama dusun harus unik.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="keterangan" class="form-label">Keterangan</label>
-                            <textarea class="form-control"
-                                id="keterangan"
-                                name="keterangan"
-                                rows="3"
-                                placeholder="Tambahan informasi tentang dusun"><?= isset($_POST['keterangan']) ? htmlspecialchars($_POST['keterangan']) : '' ?></textarea>
-                            <div class="form-text">
-                                Informasi tambahan seperti batas wilayah, jumlah penduduk, dll.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="ti ti-x me-1"></i>Batal
-                        </button>
-                        <button type="submit" name="add_dusun" class="btn btn-primary">
-                            <i class="ti ti-check me-1"></i>Simpan
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Edit Dusun -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">
-                        <i class="ti ti-edit me-2"></i>Edit Dusun
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="POST" action="">
-                    <input type="hidden" name="id" id="edit_id">
-                    <div class="modal-body">
-                        <div id="edit_errors"></div>
-
-                        <div class="mb-3">
-                            <label for="edit_dusun" class="form-label required">Nama Dusun</label>
-                            <input type="text"
-                                class="form-control"
-                                id="edit_dusun"
-                                name="dusun"
-                                placeholder="Masukkan nama dusun"
-                                required>
-                            <div class="error-message" id="edit_dusun_error"></div>
-                            <div class="form-text">
-                                Maksimal 100 karakter. Nama dusun harus unik.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="edit_keterangan" class="form-label">Keterangan</label>
-                            <textarea class="form-control"
-                                id="edit_keterangan"
-                                name="keterangan"
-                                rows="3"
-                                placeholder="Tambahan informasi tentang dusun"></textarea>
-                            <div class="form-text">
-                                Informasi tambahan seperti batas wilayah, jumlah penduduk, dll.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="ti ti-x me-1"></i>Batal
-                        </button>
-                        <button type="submit" name="edit_dusun" class="btn btn-primary">
-                            <i class="ti ti-check me-1"></i>Perbarui
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <?php include_once '../includes/footer.php'; ?>
 

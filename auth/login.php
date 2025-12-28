@@ -47,7 +47,7 @@ if (isset($_POST['login'])) {
       if ($user['role'] == 'admin') {
         header("Location: ../admin/index.php");
       } else {
-        header("Location: ../owner/index.php");
+        header("Location: ../kepala_desa/index.php");
       }
       exit();
     } else {

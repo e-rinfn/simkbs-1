@@ -9,7 +9,7 @@ if (!isLoggedIn()) {
     exit;
 }
 
-if ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'kades' && $_SESSION['role'] !== 'sekretaris') {
+if ($_SESSION['role'] !== 'kepala_desa') {
     header("Location: {$base_url}/auth/role_tidak_cocok.php");
     exit();
 }
@@ -798,9 +798,6 @@ $base_url_path_surat = $base_url . '/uploads/surat/';
                                     <a href="export_surat_masuk_pdf.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-pdf">
                                         <i class="ti ti-file-text"></i> PDF
                                     </a>
-                                    <button type="button" class="btn btn-print" onclick="printTable('masuk')">
-                                        <i class="ti ti-printer"></i> Cetak
-                                    </button>
                                 </div>
                             </div>
 
@@ -1102,9 +1099,6 @@ $base_url_path_surat = $base_url . '/uploads/surat/';
                                     <a href="export_surat_keluar_pdf.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-pdf">
                                         <i class="ti ti-file-text"></i> PDF
                                     </a>
-                                    <button type="button" class="btn btn-print" onclick="printTable('keluar')">
-                                        <i class="ti ti-printer"></i> Cetak
-                                    </button>
                                 </div>
                             </div>
 

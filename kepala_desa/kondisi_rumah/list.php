@@ -8,7 +8,7 @@ if (!isLoggedIn()) {
 }
 
 // Jika diperlukan role tertentu (admin/kades), sesuaikan dengan kebutuhan
-if ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'kades') {
+if ($_SESSION['role'] !== 'kepala_desa') {
     header("Location: {$base_url}/auth/role_tidak_cocok.php");
     exit();
 }
@@ -690,12 +690,6 @@ foreach ($data_rumah as $rumah) {
                                                         title="Detail"
                                                         data-bs-toggle="tooltip">
                                                         <i class="ti ti-eye"></i>
-                                                    </a>
-                                                    <a href="edit.php?nik=<?= $rumah['NIK']; ?>"
-                                                        class="btn btn-primary"
-                                                        title="Edit"
-                                                        data-bs-toggle="tooltip">
-                                                        <i class="ti ti-pencil"></i>
                                                     </a>
                                                     <?php if ($_SESSION['role'] === 'admin'): ?>
                                                         <?php if ($rumah['rumah_id']): ?>

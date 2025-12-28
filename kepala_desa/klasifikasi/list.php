@@ -9,7 +9,7 @@ if (!isLoggedIn()) {
     exit;
 }
 
-if ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'kades') {
+if ($_SESSION['role'] !== 'kepala_desa') {
     header("Location: {$base_url}/auth/role_tidak_cocok.php");
     exit();
 }

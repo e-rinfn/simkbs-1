@@ -8,7 +8,7 @@ if (!isLoggedIn()) {
 }
 
 // Jika diperlukan role tertentu (admin/kades), sesuaikan dengan kebutuhan
-if ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'kades') {
+if ($_SESSION['role'] !== 'kepala_desa') {
     header("Location: {$base_url}/auth/role_tidak_cocok.php");
     exit();
 }
@@ -236,11 +236,7 @@ $total_data = count($kependudukan);
             <div class="row">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2>Data Kependudukan</h2>
-                    <div>
-                        <a href="add.php" class="btn btn-success">
-                            <i class="ti ti-user-plus"></i> Tambah Penduduk
-                        </a>
-                    </div>
+
                 </div>
 
                 <!-- Filter Section -->
@@ -467,22 +463,6 @@ $total_data = count($kependudukan);
                                                         data-bs-toggle="tooltip">
                                                         <i class="ti ti-eye"></i>
                                                     </a>
-                                                    <a href="edit.php?nik=<?= $penduduk['NIK']; ?>"
-                                                        class="btn btn-primary"
-                                                        title="Edit"
-                                                        data-bs-toggle="tooltip">
-                                                        <i class="ti ti-pencil"></i>
-                                                    </a>
-                                                    <?php if ($_SESSION['role'] === 'admin'): ?>
-                                                        <a href="delete.php?nik=<?= $penduduk['NIK']; ?>"
-                                                            class="btn btn-danger btn-delete"
-                                                            title="Hapus"
-                                                            data-bs-toggle="tooltip"
-                                                            data-id="<?= $penduduk['NIK']; ?>"
-                                                            data-nama="<?= htmlspecialchars($penduduk['NAMA_LGKP']); ?>">
-                                                            <i class="ti ti-trash"></i>
-                                                        </a>
-                                                    <?php endif; ?>
                                                 </div>
                                             </td>
                                         </tr>
