@@ -18,7 +18,7 @@ include_once __DIR__ . '/../../config/config.php';
 session_start();
 if (!isset($_SESSION['user_id'])) {
     // Redirect ke login
-    header("Location: {$base_url}auth/login.php");
+    header("Location: {$base_url}/auth/login.php");
     exit();
 }
 
@@ -167,8 +167,9 @@ if (file_exists($logoPath)) {
 }
 
 // Garis pemisah
-$pdf->Line(10, $pdf->GetY() + 2, $pdf->GetPageWidth() - 10, $pdf->GetY() + 2);
-$pdf->Ln(5);
+$y = $pdf->GetY() + 7; // atur angka sesuai kebutuhan
+$pdf->Line(10, $y, $pdf->GetPageWidth() - 10, $y);
+$pdf->Ln(8);
 
 // Informasi filter
 $pdf->SetFont('helvetica', '', 9);
@@ -218,6 +219,7 @@ $headers = array(
 foreach ($headers as $i => $header) {
     $pdf->Cell($col_widths[$i], 7, $header, 1, 0, 'C', 1);
 }
+
 $pdf->Ln();
 
 // Data rows - VERSI SEDERHANA

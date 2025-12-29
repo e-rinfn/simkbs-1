@@ -123,8 +123,9 @@ if (file_exists($logoPath)) {
 }
 
 // Garis pemisah
-$pdf->Line(10, $pdf->GetY(), $pdf->GetPageWidth() - 10, $pdf->GetY());
-$pdf->Ln(5);
+$y = $pdf->GetY() + 7; // atur angka sesuai kebutuhan
+$pdf->Line(10, $y, $pdf->GetPageWidth() - 10, $y);
+$pdf->Ln(8);
 
 // Informasi filter
 $filter_info = [];
@@ -243,9 +244,9 @@ $pdf->SetX($ttdX);
 $pdf->SetFont('helvetica', 'BU', 10);
 $pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
 
-$pdf->SetX($ttdX);
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
+// $pdf->SetX($ttdX);
+// $pdf->SetFont('helvetica', '', 9);
+// $pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
 
 // Informasi laporan di bagian bawah
 $pdf->Ln(10);

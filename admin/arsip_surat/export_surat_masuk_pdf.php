@@ -207,8 +207,9 @@ foreach ($data_surat as $surat) {
 
 
 // Garis pemisah
-$pdf->Line(10, $pdf->GetY(), $pdf->GetPageWidth() - 10, $pdf->GetY());
-$pdf->Ln(5);
+$y = $pdf->GetY() + 7; // atur angka sesuai kebutuhan
+$pdf->Line(10, $y, $pdf->GetPageWidth() - 10, $y);
+$pdf->Ln(8);
 
 // Hitung posisi untuk TTD
 $pageWidth = $pdf->GetPageWidth();
