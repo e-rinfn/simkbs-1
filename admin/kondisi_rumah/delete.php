@@ -56,7 +56,7 @@ try {
     $sql_delete = "DELETE FROM tabel_rumah WHERE NIK = '$nik'";
 
     if (!$conn->query($sql_delete)) {
-        throw new Exception("Gagal menghapus data kondisi rumah: " . $conn->error);
+        // throw new Exception("Gagal menghapus data kondisi rumah: " . $conn->error);
     }
 
     // Commit transaksi
@@ -69,7 +69,7 @@ try {
     $_SESSION['success'] = "Data kondisi rumah milik <strong>$nama_penduduk</strong> berhasil dihapus";
 } catch (Exception $e) {
     $conn->rollback();
-    $_SESSION['error'] = "Gagal menghapus data kondisi rumah: " . $e->getMessage();
+    // $_SESSION['error'] = "Gagal menghapus data kondisi rumah: " . $e->getMessage();
 }
 
 header("Location: list.php");
