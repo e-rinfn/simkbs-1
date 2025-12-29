@@ -1,5 +1,5 @@
 <?php
-// list.php
+
 include_once __DIR__ . '/../../config/config.php';
 require_once '../includes/header.php';
 
@@ -96,97 +96,331 @@ $data = query($sql);
 $stat_total = query("SELECT COUNT(*) as total FROM tabel_kependudukan")[0]['total'];
 $stat_laki = query("SELECT COUNT(*) as total FROM tabel_kependudukan WHERE JK = 'L'")[0]['total'];
 $stat_perempuan = query("SELECT COUNT(*) as total FROM tabel_kependudukan WHERE JK = 'P'")[0]['total'];
+
 ?>
 
-<!DOCTYPE html>
-<html lang="id">
+<style>
+    .swal2-container {
+        z-index: 99999 !important;
+    }
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Penduduk</title>
-    <?php include_once '../includes/css.php'; ?>
-    <style>
-        .table th,
-        .table td {
-            vertical-align: middle;
+    .tab-content {
+        margin-top: 20px;
+    }
+
+    .nav-tabs .nav-link {
+        font-weight: 500;
+        padding: 10px 20px;
+        border: none;
+        color: #6c757d;
+        position: relative;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #0d6efd;
+        background-color: transparent;
+        border-bottom: 3px solid #0d6efd;
+    }
+
+    .nav-tabs .nav-link:hover {
+        color: #0d6efd;
+    }
+
+    .filter-container {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .table-responsive {
+        margin-bottom: 30px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .stat-card.masuk {
+        border-left: 4px solid #0d6efd;
+    }
+
+    .stat-card.keluar {
+        border-left: 4px solid #198754;
+    }
+
+    .stat-card .stat-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 5px 0;
+    }
+
+    .stat-card.masuk .stat-value {
+        color: #0d6efd;
+    }
+
+    .stat-card.keluar .stat-value {
+        color: #198754;
+    }
+
+    .stat-card .stat-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .badge-status {
+        font-size: 0.85em;
+        padding: 5px 10px;
+        border-radius: 20px;
+    }
+
+    /* Status untuk surat masuk */
+    .badge-baru {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .badge-diproses {
+        background-color: #ffc107;
+        color: #212529;
+    }
+
+    .badge-selesai {
+        background-color: #198754;
+        color: white;
+    }
+
+    .badge-arsip {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    /* Status untuk surat keluar */
+    .badge-draft {
+        background-color: #6c757dff;
+        color: white;
+    }
+
+    .badge-terbit {
+        background-color: #6c757dff;
+        color: white;
+    }
+
+    .badge-terkirim {
+        background-color: #198754;
+        color: white;
+    }
+
+    .badge-sifat {
+        font-size: 0.8em;
+        padding: 4px 8px;
+        border-radius: 15px;
+    }
+
+    .badge-biasa {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .badge-penting {
+        background-color: #fd7e14;
+        color: white;
+    }
+
+    .badge-rahasia {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .badge-sangat-rahasia {
+        background-color: #6f42c1;
+        color: white;
+    }
+
+    .btn-excel {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+
+    .btn-excel:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+        color: white;
+    }
+
+    .btn-pdf {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+
+    .btn-pdf:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+        color: white;
+    }
+
+    .btn-print {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+        color: white;
+    }
+
+    .btn-print:hover {
+        background-color: #138496;
+        border-color: #117a8b;
+        color: white;
+    }
+
+    .file-icon {
+        color: #0d6efd;
+        font-size: 1.2em;
+    }
+
+    .file-link {
+        text-decoration: none;
+        color: #0d6efd;
+    }
+
+    .file-link:hover {
+        text-decoration: underline;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        flex-wrap: nowrap;
+    }
+
+    .action-buttons .btn {
+        padding: 4px 8px;
+        font-size: 0.875rem;
+    }
+
+    .perihal-text {
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .perihal-text:hover {
+        overflow: visible;
+        white-space: normal;
+        position: absolute;
+        background: white;
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        max-width: 400px;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+    }
+
+    .no-data i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    .info-badge {
+        background-color: #6c757d;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        margin-left: 10px;
+    }
+
+    .urgent-row {
+        background-color: rgba(255, 193, 7, 0.1);
+    }
+
+    .secret-row {
+        background-color: rgba(220, 53, 69, 0.05);
+    }
+
+    .tab-pane {
+        animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
         }
 
-        .badge-jk-L {
-            background-color: #0d6efd;
+        to {
+            opacity: 1;
         }
+    }
 
-        .badge-jk-P {
-            background-color: #dc3545;
-        }
+    .tab-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
 
-        .badge-disabilitas-YA {
-            background-color: #ffc107;
-            color: #000;
-        }
+    .tab-title {
+        margin: 0;
+    }
 
-        .badge-disabilitas-TIDAK {
-            background-color: #198754;
-        }
+    .tab-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+</style>
 
-        .action-buttons {
-            white-space: nowrap;
-        }
+<!-- [Body] Start -->
 
-        .pagination .page-link {
-            color: #0d6efd;
-        }
+<body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
+    <!-- [ Pre-loader ] start -->
+    <div class="loader-bg">
+        <div class="loader-track">
+            <div class="loader-fill"></div>
+        </div>
+    </div>
+    <!-- [ Pre-loader ] End -->
 
-        .pagination .page-item.active .page-link {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-        }
-
-        .filter-section {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid #dee2e6;
-        }
-
-        .filter-section h6 {
-            color: #0d6efd;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .filter-active {
-            background-color: #0d6efd !important;
-            color: white !important;
-            border-color: #0d6efd !important;
-        }
-
-        .filter-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: #dc3545;
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
-</head>
-
-<body>
-    <?php include_once '../includes/navbar.php'; ?>
+    <!-- Sidebar Start -->
     <?php include_once '../includes/sidebar.php'; ?>
+    <!-- Sidebar End -->
+
+    <?php include_once '../includes/navbar.php'; ?>
 
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
+
+            <!-- [ Main Content ] start -->
             <div class="row">
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -550,124 +784,126 @@ $stat_perempuan = query("SELECT COUNT(*) as total FROM tabel_kependudukan WHERE 
     <!-- [ Main Content ] end -->
 
     <?php include_once '../includes/footer.php'; ?>
-    <?php include_once '../includes/js.php'; ?>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Delete confirmation
-            const deleteButtons = document.querySelectorAll('.delete-btn');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const id = this.getAttribute('data-id');
-                    const name = this.getAttribute('data-name');
+</body>
+<!-- [Body] end -->
 
-                    Swal.fire({
-                        title: 'Apakah Anda yakin?',
-                        text: `Anda akan menghapus data ${name}`,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Ya, Hapus!',
-                        cancelButtonText: 'Batal'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = `list.php?delete=${id}&<?=
-                                                                            http_build_query(array_diff_key($_GET, ['delete' => '']))
-                                                                            ?>`;
-                        }
-                    });
-                });
-            });
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Delete confirmation
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
 
-            // Quick search with debounce
-            let searchTimeout;
-            const searchInput = document.getElementById('search');
-
-            if (searchInput) {
-                searchInput.addEventListener('input', function(e) {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => {
-                        if (this.value.length === 0 || this.value.length >= 2) {
-                            document.getElementById('filterForm').submit();
-                        }
-                    }, 500);
-                });
-            }
-
-            // Export to Excel
-            document.getElementById('exportBtn')?.addEventListener('click', function() {
                 Swal.fire({
-                    title: 'Ekspor Data',
-                    text: 'Pilih format ekspor:',
-                    icon: 'info',
+                    title: 'Apakah Anda yakin?',
+                    text: `Anda akan menghapus data ${name}`,
+                    icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Excel',
-                    cancelButtonText: 'PDF',
-                    showDenyButton: true,
-                    denyButtonText: 'Batal'
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        const params = new URLSearchParams(window.location.search);
-                        window.location.href = `export.php?type=excel&${params.toString()}`;
-                    } else if (result.dismiss === Swal.DismissReason.cancel) {
-                        const params = new URLSearchParams(window.location.search);
-                        window.location.href = `export.php?type=pdf&${params.toString()}`;
+                        window.location.href = `list.php?delete=${id}&<?=
+                                                                        http_build_query(array_diff_key($_GET, ['delete' => '']))
+                                                                        ?>`;
                     }
                 });
             });
+        });
 
-            // Auto submit on dusun select change
-            document.getElementById('dusun').addEventListener('change', function() {
-                if (this.value == 0 || this.value != '<?= $dusun_filter ?>') {
-                    document.getElementById('filterForm').submit();
+        // Quick search with debounce
+        let searchTimeout;
+        const searchInput = document.getElementById('search');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    if (this.value.length === 0 || this.value.length >= 2) {
+                        document.getElementById('filterForm').submit();
+                    }
+                }, 500);
+            });
+        }
+
+        // Export to Excel
+        document.getElementById('exportBtn')?.addEventListener('click', function() {
+            Swal.fire({
+                title: 'Ekspor Data',
+                text: 'Pilih format ekspor:',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Excel',
+                cancelButtonText: 'PDF',
+                showDenyButton: true,
+                denyButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const params = new URLSearchParams(window.location.search);
+                    window.location.href = `export.php?type=excel&${params.toString()}`;
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    const params = new URLSearchParams(window.location.search);
+                    window.location.href = `export.php?type=pdf&${params.toString()}`;
                 }
             });
         });
 
-        // Set jenis kelamin filter
-        function setJkFilter(value) {
-            document.getElementById('jk').value = value;
-            document.querySelectorAll('.filter-jk').forEach(btn => {
-                btn.classList.remove('filter-active');
-            });
-            event.target.classList.add('filter-active');
-            document.getElementById('filterForm').submit();
-        }
+        // Auto submit on dusun select change
+        document.getElementById('dusun').addEventListener('change', function() {
+            if (this.value == 0 || this.value != '<?= $dusun_filter ?>') {
+                document.getElementById('filterForm').submit();
+            }
+        });
+    });
 
-        // Remove specific filter
-        function removeFilter(filterName) {
-            const url = new URL(window.location.href);
-            url.searchParams.delete(filterName);
-            url.searchParams.delete('page'); // Reset to page 1
-            window.location.href = url.toString();
-        }
+    // Set jenis kelamin filter
+    function setJkFilter(value) {
+        document.getElementById('jk').value = value;
+        document.querySelectorAll('.filter-jk').forEach(btn => {
+            btn.classList.remove('filter-active');
+        });
+        event.target.classList.add('filter-active');
+        document.getElementById('filterForm').submit();
+    }
 
-        // Print data
-        function printData() {
-            const params = new URLSearchParams(window.location.search);
-            window.open(`print.php?${params.toString()}`, '_blank');
-        }
-    </script>
+    // Remove specific filter
+    function removeFilter(filterName) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete(filterName);
+        url.searchParams.delete('page'); // Reset to page 1
+        window.location.href = url.toString();
+    }
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Delete confirmation - VERSION TERBARU
-            const deleteButtons = document.querySelectorAll('.btn-delete');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const id = this.getAttribute('data-id');
-                    const nama = this.getAttribute('data-nama');
-                    const nik = this.getAttribute('data-nik');
+    // Print data
+    function printData() {
+        const params = new URLSearchParams(window.location.search);
+        window.open(`print.php?${params.toString()}`, '_blank');
+    }
+</script>
 
-                    Swal.fire({
-                        title: 'Hapus Data Penduduk?',
-                        html: `<div class="text-start">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Delete confirmation - VERSION TERBARU
+        const deleteButtons = document.querySelectorAll('.btn-delete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const id = this.getAttribute('data-id');
+                const nama = this.getAttribute('data-nama');
+                const nik = this.getAttribute('data-nik');
+
+                Swal.fire({
+                    title: 'Hapus Data Penduduk?',
+                    html: `<div class="text-start">
                          <p>Anda akan menghapus data:</p>
                          <ul class="ps-3">
                            <li><strong>NIK:</strong> ${nik}</li>
@@ -675,73 +911,72 @@ $stat_perempuan = query("SELECT COUNT(*) as total FROM tabel_kependudukan WHERE 
                          </ul>
                          <p class="text-danger"><i class="ti ti-alert-triangle"></i> Data yang dihapus tidak dapat dikembalikan!</p>
                        </div>`,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: '<i class="ti ti-trash"></i> Ya, Hapus!',
-                        cancelButtonText: '<i class="ti ti-x"></i> Batal',
-                        reverseButtons: true,
-                        customClass: {
-                            confirmButton: 'btn btn-danger',
-                            cancelButton: 'btn btn-secondary'
-                        }
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Buat URL dengan parameter delete
-                            const currentUrl = new URL(window.location.href);
-                            currentUrl.searchParams.set('delete', id);
-                            currentUrl.searchParams.delete('page'); // Kembali ke halaman 1 setelah delete
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="ti ti-trash"></i> Ya, Hapus!',
+                    cancelButtonText: '<i class="ti ti-x"></i> Batal',
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: 'btn btn-danger',
+                        cancelButton: 'btn btn-secondary'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Buat URL dengan parameter delete
+                        const currentUrl = new URL(window.location.href);
+                        currentUrl.searchParams.set('delete', id);
+                        currentUrl.searchParams.delete('page'); // Kembali ke halaman 1 setelah delete
 
-                            // Redirect ke URL dengan parameter delete
-                            window.location.href = currentUrl.toString();
-                        }
-                    });
+                        // Redirect ke URL dengan parameter delete
+                        window.location.href = currentUrl.toString();
+                    }
                 });
             });
-
-            // Quick search with debounce
-            let searchTimeout;
-            const searchInput = document.getElementById('search');
-
-            if (searchInput) {
-                searchInput.addEventListener('input', function(e) {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => {
-                        if (this.value.length === 0 || this.value.length >= 2) {
-                            document.getElementById('filterForm').submit();
-                        }
-                    }, 500);
-                });
-            }
-
-            // Auto submit on dusun select change
-            const dusunSelect = document.getElementById('dusun');
-            if (dusunSelect) {
-                dusunSelect.addEventListener('change', function() {
-                    document.getElementById('filterForm').submit();
-                });
-            }
         });
 
-        // Set jenis kelamin filter
-        function setJkFilter(value) {
-            document.getElementById('jk').value = value;
-            document.querySelectorAll('.filter-jk').forEach(btn => {
-                btn.classList.remove('filter-active');
+        // Quick search with debounce
+        let searchTimeout;
+        const searchInput = document.getElementById('search');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    if (this.value.length === 0 || this.value.length >= 2) {
+                        document.getElementById('filterForm').submit();
+                    }
+                }, 500);
             });
-            event.target.classList.add('filter-active');
-            document.getElementById('filterForm').submit();
         }
 
-        // Remove specific filter
-        function removeFilter(filterName) {
-            const url = new URL(window.location.href);
-            url.searchParams.delete(filterName);
-            url.searchParams.delete('page'); // Reset to page 1
-            window.location.href = url.toString();
+        // Auto submit on dusun select change
+        const dusunSelect = document.getElementById('dusun');
+        if (dusunSelect) {
+            dusunSelect.addEventListener('change', function() {
+                document.getElementById('filterForm').submit();
+            });
         }
-    </script>
-</body>
+    });
+
+    // Set jenis kelamin filter
+    function setJkFilter(value) {
+        document.getElementById('jk').value = value;
+        document.querySelectorAll('.filter-jk').forEach(btn => {
+            btn.classList.remove('filter-active');
+        });
+        event.target.classList.add('filter-active');
+        document.getElementById('filterForm').submit();
+    }
+
+    // Remove specific filter
+    function removeFilter(filterName) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete(filterName);
+        url.searchParams.delete('page'); // Reset to page 1
+        window.location.href = url.toString();
+    }
+</script>
 
 </html>
