@@ -1,142 +1,158 @@
 <?php
-// Start output buffering untuk menangkap semua output
-ob_start();
+// export_pdf.php
+// Aktifkan error reporting
+error_reporting(error_level: E_ALL);
+ini_set('display_errors', 1);
 
-require_once '../includes/header.php';
-
-// Cek apakah user sudah login
-if (!isLoggedIn()) {
+// Pastikan tidak ada output sebelum ini
+if (ob_get_length()) {
     ob_end_clean();
-    header("Location: {$base_url}auth/login.php");
-    exit;
 }
 
-// Jika diperlukan role tertentu (admin/kades), sesuaikan dengan kebutuhan
-if ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'kades') {
-    ob_end_clean();
-    header("Location: {$base_url}/auth/role_tidak_cocok.php");
+// Mulai output buffering
+ob_start();
+
+include_once __DIR__ . '/../../config/config.php';
+
+// Cek apakah user sudah login
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    // Redirect ke login
+    header("Location: {$base_url}auth/login.php");
     exit();
 }
 
-// Include TCPDF
-require_once '../../vendor/autoload.php';
+// Filter functionality (sama seperti di list.php)
+$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+$dusun_filter = isset($_GET['dusun']) ? intval($_GET['dusun']) : 0;
+$jk_filter = isset($_GET['jk']) ? $conn->real_escape_string($_GET['jk']) : '';
 
-// Parameter filter yang sama dengan list.php
-$dusun_filter = isset($_GET['dusun']) ? $_GET['dusun'] : '';
-$jk_filter = isset($_GET['jk']) ? $_GET['jk'] : '';
-$search = isset($_GET['search']) ? $_GET['search'] : '';
-
-// Query data kependudukan dengan filter yang sama
 $where_conditions = [];
-$params = [];
-$params_types = '';
 
-if (!empty($dusun_filter)) {
-    $where_conditions[] = "k.DSN = ?";
-    $params[] = $dusun_filter;
-    $params_types .= 'i';
+// Build WHERE conditions (sama seperti di list.php)
+if ($search) {
+    $where_conditions[] = "(NIK LIKE '%$search%' OR NO_KK LIKE '%$search%' OR NAMA_LGKP LIKE '%$search%' OR NAMA_PANGGILAN LIKE '%$search%' OR ALAMAT LIKE '%$search%')";
 }
 
-if (!empty($jk_filter)) {
-    $where_conditions[] = "k.JK = ?";
-    $params[] = $jk_filter;
-    $params_types .= 's';
+if ($dusun_filter > 0) {
+    $where_conditions[] = "k.DSN = $dusun_filter";
 }
 
-if (!empty($search)) {
-    $where_conditions[] = "(k.NO_KK LIKE ? OR k.NIK LIKE ? OR k.NAMA_LGKP LIKE ?)";
-    $search_term = "%$search%";
-    $params[] = $search_term;
-    $params[] = $search_term;
-    $params[] = $search_term;
-    $params_types .= 'sss';
+if ($jk_filter && in_array($jk_filter, ['L', 'P'])) {
+    $where_conditions[] = "k.JK = '$jk_filter'";
 }
 
-$where_sql = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_conditions) : "";
+// Combine WHERE conditions
+$where = '';
+if (!empty($where_conditions)) {
+    $where = "WHERE " . implode(" AND ", $where_conditions);
+}
 
-// Query utama
-$sql = "SELECT 
-            k.NO_KK,
-            k.NIK,
-            k.NAMA_LGKP,
-            k.NAMA_PANGGILAN,
-            k.HBKEL,
-            k.JK,
-            k.TMPT_LHR,
-            k.TGL_LHR,
-            k.AGAMA,
-            k.STATUS_KAWIN,
-            k.PENDIDIKAN,
-            k.PEKERJAAN,
-            k.DSN,
-            k.rt,
-            k.rw,
-            d.dusun,
-            p.jenis_pekerjaan,
-            p.penghasilan_per_bulan
-        FROM tabel_kependudukan k
-        LEFT JOIN tabel_dusun d ON k.DSN = d.id
-        LEFT JOIN tabel_pekerjaan p ON k.NIK = p.NIK
-        $where_sql
-        ORDER BY k.NAMA_LGKP";
+// Get all data without pagination (untuk PDF)
+$sql = "SELECT k.*, d.dusun as nama_dusun 
+        FROM tabel_kependudukan k 
+        LEFT JOIN tabel_dusun d ON k.DSN = d.id 
+        $where 
+        ORDER BY k.DSN, k.NAMA_LGKP";
 
-// Eksekusi query dengan prepared statement
-global $conn;
-$data_kependudukan = [];
-
-try {
-    if (!empty($params)) {
-        $stmt = $conn->prepare($sql);
-        if ($stmt) {
-            if (!empty($params_types)) {
-                $stmt->bind_param($params_types, ...$params);
-            }
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $data_kependudukan = $result->fetch_all(MYSQLI_ASSOC);
-            $stmt->close();
-        }
-    } else {
-        $result = mysqli_query($conn, $sql);
-        if ($result) {
-            $data_kependudukan = mysqli_fetch_all($result, MYSQLI_ASSOC);
-            mysqli_free_result($result);
-        }
+$result = $conn->query($sql);
+$data = [];
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
     }
-} catch (Exception $e) {
-    error_log("Database error in PDF export: " . $e->getMessage());
 }
 
-// Clear semua output buffer sebelum membuat PDF
-ob_end_clean();
+// Get statistics
+$total_records = count($data);
+$total_laki = 0;
+$total_perempuan = 0;
 
-// Inisialisasi TCPDF
+foreach ($data as $row) {
+    if ($row['JK'] == 'L') {
+        $total_laki++;
+    } else {
+        $total_perempuan++;
+    }
+}
+
+// Get dusun name for filter info
+$dusun_nama = 'Semua Dusun';
+if ($dusun_filter > 0) {
+    $sql_dusun = "SELECT dusun FROM tabel_dusun WHERE id = $dusun_filter";
+    $dusun_result = $conn->query($sql_dusun);
+    if ($dusun_result && $dusun_row = $dusun_result->fetch_assoc()) {
+        $dusun_nama = $dusun_row['dusun'];
+    }
+}
+
+// Pastikan TCPDF tersedia
+$tcpdf_path = __DIR__ . '/../../vendor/tecnickcom/tcpdf/tcpdf.php';
+if (!file_exists($tcpdf_path)) {
+    // Fallback: coba path lain
+    $tcpdf_path = __DIR__ . '/../../vendor/tcpdf/tcpdf.php';
+
+    if (!file_exists($tcpdf_path)) {
+        die('TCPDF library tidak ditemukan. Silakan install dengan: composer require tecnickcom/tcpdf');
+    }
+}
+
+require_once $tcpdf_path;
+
+// Hapus semua output buffer sebelum membuat PDF
+while (ob_get_level()) {
+    ob_end_clean();
+}
+
+// Create new PDF document
 $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
+
+// Set document information
+$pdf->SetCreator('Sistem Kependudukan Desa');
+$pdf->SetAuthor('Desa Kurniabakti');
+$pdf->SetTitle('Data Penduduk');
+$pdf->SetSubject('Export Data Penduduk');
+
+// Remove default header/footer
 $pdf->setPrintHeader(false);
 $pdf->setPrintFooter(false);
+
+// Set margins
 $pdf->SetMargins(10, 10, 10);
+$pdf->SetAutoPageBreak(TRUE, 15);
+
+// Add a page
 $pdf->AddPage();
 
-// Set font
-$pdf->SetFont('helvetica', '', 10);
+// Function untuk truncate status kawin
+function truncateStatusKawin($text)
+{
+    $short = [
+        'BELUM KAWIN' => 'BLM KWN',
+        'KAWIN' => 'KAWIN',
+        'CERAI HIDUP' => 'CR HIDUP',
+        'CERAI MATI' => 'CR MATI'
+    ];
+    return isset($short[$text]) ? $short[$text] : substr($text, 0, 8);
+}
 
 // Header dengan Logo
 $pdf->SetFont('helvetica', 'B', 16);
 
 // Path logo (sesuaikan dengan lokasi logo Anda)
-$logoPath = __DIR__ . '/../../assets/img/LogoKBS.png'; // Ganti dengan path logo Anda
+$logoPath = __DIR__ . '/../../assets/img/LogoKBS.png';
 
 // Cek apakah logo ada
 if (file_exists($logoPath)) {
     // Tambahkan logo di kiri atas
-    $pdf->Image($logoPath, 10, 10, 25); // x=10, y=10, width=25
+    $pdf->Image($logoPath, 10, 10, 25, 0, '', '', '', false, 300, '', false, false, 0);
 
     // Pindahkan posisi untuk judul di kanan logo
-    $pdf->SetXY(40, 10); // Mulai dari 40mm dari kiri (10+25+5)
+    $pdf->SetXY(40, 10);
     $pdf->Cell(0, 10, 'LAPORAN DATA KEPENDUDUKAN', 0, 1);
 
     // Informasi desa di bawah judul
-    $pdf->SetXY(40, $pdf->GetY() + 1);
+    $pdf->SetXY(40, $pdf->GetY());
     $pdf->SetFont('helvetica', '', 10);
     $pdf->Cell(0, 5, 'Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya', 0, 1);
 
@@ -151,58 +167,50 @@ if (file_exists($logoPath)) {
 }
 
 // Garis pemisah
-$pdf->Line(10, $pdf->GetY(), $pdf->GetPageWidth() - 10, $pdf->GetY());
+$pdf->Line(10, $pdf->GetY() + 2, $pdf->GetPageWidth() - 10, $pdf->GetY() + 2);
 $pdf->Ln(5);
 
-
 // Informasi filter
+$pdf->SetFont('helvetica', '', 9);
 $filter_info = [];
-if (!empty($dusun_filter)) {
-    $sql_dusun = "SELECT dusun FROM tabel_dusun WHERE id = ?";
-    $stmt = $conn->prepare($sql_dusun);
-    $stmt->bind_param("i", $dusun_filter);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $dusun_data = $result->fetch_assoc();
-    $nama_dusun = $dusun_data['dusun'] ?? 'Dusun tidak diketahui';
-    $filter_info[] = "Dusun: $nama_dusun";
-    $stmt->close();
+
+if (!empty($search)) {
+    $filter_info[] = "Pencarian: \"" . htmlspecialchars($search) . "\"";
 }
+
+$filter_info[] = "Dusun: $dusun_nama";
 
 if (!empty($jk_filter)) {
     $jk_text = ($jk_filter == 'L') ? 'Laki-laki' : 'Perempuan';
     $filter_info[] = "Jenis Kelamin: $jk_text";
+} else {
+    $filter_info[] = "Jenis Kelamin: Semua";
 }
 
-if (!empty($search)) {
-    $filter_info[] = "Kata kunci: \"$search\"";
-}
-
-$filter_text = !empty($filter_info) ? 'Filter: ' . implode(', ', $filter_info) : 'Semua Data';
-$pdf->SetFont('helvetica', '', 9);
+$filter_text = 'Filter: ' . implode(' | ', $filter_info);
 $pdf->Cell(0, 5, $filter_text, 0, 1);
-$pdf->Cell(0, 5, 'Tanggal Cetak: ' . dateIndo(date('Y-m-d H:i:s')), 0, 1);
-$pdf->Cell(0, 5, 'Total Data: ' . number_format(count($data_kependudukan)) . ' penduduk', 0, 1);
+$pdf->Cell(0, 5, 'Tanggal Cetak: ' . dateIndo('now'), 0, 1);
+$pdf->Cell(0, 5, 'Total Data: ' . number_format($total_records) . ' | Laki-laki: ' . number_format($total_laki) . ' | Perempuan: ' . number_format($total_perempuan), 0, 1);
 $pdf->Ln(3);
 
-// Tabel header
+// Tabel header - SEDERHANA TANPA MULTICELL
 $pdf->SetFillColor(240, 240, 240);
 $pdf->SetFont('helvetica', 'B', 9);
 
-// Set column widths (landscape A4 = 297mm width, minus margins)
-$col_widths = array(8, 30, 30, 40, 15, 20, 25, 25, 20, 30, 35);
+// Set column widths yang lebih sederhana
+$col_widths = array(8, 28, 28, 40, 10, 10, 30, 20, 18, 45, 40);
 
 $headers = array(
     'No',
-    'No. KK',
     'NIK',
-    'Nama Lengkap',
-    'Kelamin',
-    'Hub. Kel',
-    'Tempat Lahir',
-    'Tanggal Lahir',
-    'Pendidikan',
-    'Pekerjaan',
+    'No. KK',
+    'Nama',
+    'JK',
+    'Usia',
+    'Tgl Lahir',
+    'Status',
+    'Agama',
+    'Alamat',
     'Dusun'
 );
 
@@ -212,11 +220,11 @@ foreach ($headers as $i => $header) {
 }
 $pdf->Ln();
 
-// Data rows
+// Data rows - VERSI SEDERHANA
 $pdf->SetFont('helvetica', '', 8);
 $no = 1;
 
-foreach ($data_kependudukan as $penduduk) {
+foreach ($data as $row) {
     // Jika hampir penuh, tambah halaman baru
     if ($pdf->GetY() > 180) {
         $pdf->AddPage();
@@ -231,42 +239,66 @@ foreach ($data_kependudukan as $penduduk) {
 
     // Hitung usia
     $usia = '';
-    if (!empty($penduduk['TGL_LHR'])) {
-        $tgl_lahir = new DateTime($penduduk['TGL_LHR']);
-        $today = new DateTime();
-        $usia = $today->diff($tgl_lahir)->y . ' th';
+    if (!empty($row['TGL_LHR'])) {
+        try {
+            $tgl_lahir = new DateTime($row['TGL_LHR']);
+            $today = new DateTime();
+            $usia = $today->diff($tgl_lahir)->y;
+        } catch (Exception $e) {
+            $usia = '';
+        }
     }
 
-    // Format tanggal lahir
-    $tgl_lahir_formatted = !empty($penduduk['TGL_LHR']) ? dateIndo($penduduk['TGL_LHR']) : '';
+    // Format tanggal lahir (singkat)
+    $tgl_lahir_formatted = !empty($row['TGL_LHR']) ? dateIndo($row['TGL_LHR']) : '';
 
-    // Format pekerjaan
-    $pekerjaan = $penduduk['jenis_pekerjaan'] ?? $penduduk['PEKERJAAN'] ?? '';
-    $pekerjaan = smartTruncate($pekerjaan, 15);
+    // Format nama (lebih pendek)
+    $nama = smartTruncate($row['NAMA_LGKP'] ?? '', 20);
 
-    // Format nama
-    $nama = smartTruncate($penduduk['NAMA_LGKP'] ?? '', 25);
+    // Format alamat (singkat)
+    $alamat = smartTruncate($row['ALAMAT'] ?? '', 18);
+    if (!empty($row['rt'])) {
+        $alamat .= ' RT' . $row['rt'];
+    }
 
-    // Format tempat lahir
-    $tempat_lahir = smartTruncate($penduduk['TMPT_LHR'] ?? '', 12);
+    // Format agama (singkat)
+    $agama = smartTruncate($row['AGAMA'] ?? '', 6);
 
-    // Format pendidikan
-    $pendidikan = smartTruncate($penduduk['PENDIDIKAN'] ?? '', 10);
+    // Kolom 1: No
+    $pdf->Cell($col_widths[0], 6, $no++, 1, 0, 'C');
 
-    // Format dusun - khusus untuk dusun, jangan dipotong
-    $dusun = $penduduk['dusun'] ?? '';
+    // Kolom 2: NIK (format tanpa spasi agar muat)
+    $nik_text = $row['NIK'] ?? '';
+    $pdf->Cell($col_widths[1], 6, $nik_text, 1, 0, 'L');
 
-    $pdf->Cell($col_widths[0], 6, $no++, 1, 0, 'C');  // No
-    $pdf->Cell($col_widths[1], 6, formatKKNIKPDF($penduduk['NO_KK'] ?? ''), 1);  // No. KK
-    $pdf->Cell($col_widths[2], 6, formatKKNIKPDF($penduduk['NIK'] ?? ''), 1);  // NIK
-    $pdf->Cell($col_widths[3], 6, $nama, 1);  // Nama
-    $pdf->Cell($col_widths[4], 6, $penduduk['JK'] ?? '', 1, 0, 'C');  // JK
-    $pdf->Cell($col_widths[5], 6, truncateHubKeluarga($penduduk['HBKEL'] ?? '', 8), 1, 0, 'C');  // Hub. Kel
-    $pdf->Cell($col_widths[6], 6, $tempat_lahir, 1);  // Tempat Lahir
-    $pdf->Cell($col_widths[7], 6, $tgl_lahir_formatted, 1, 0, 'C');  // Tanggal Lahir
-    $pdf->Cell($col_widths[8], 6, $pendidikan, 1);  // Pendidikan
-    $pdf->Cell($col_widths[9], 6, $pekerjaan, 1);  // Pekerjaan
-    $pdf->Cell($col_widths[10], 6, $dusun, 1, 0, 'C');  // Dusun
+    // Kolom 3: No. KK
+    $kk_text = $row['NO_KK'] ?? '';
+    $pdf->Cell($col_widths[2], 6, $kk_text, 1, 0, 'L');
+
+    // Kolom 4: Nama
+    $pdf->Cell($col_widths[3], 6, $nama, 1, 0, 'L');
+
+    // Kolom 5: JK
+    $pdf->Cell($col_widths[4], 6, $row['JK'] ?? '', 1, 0, 'C');
+
+    // Kolom 6: Usia
+    $pdf->Cell($col_widths[5], 6, $usia, 1, 0, 'C');
+
+    // Kolom 7: Tgl Lahir
+    $pdf->Cell($col_widths[6], 6, $tgl_lahir_formatted, 1, 0, 'C');
+
+    // Kolom 8: Status (singkat)
+    $status = truncateStatusKawin($row['STATUS_KAWIN'] ?? '');
+    $pdf->Cell($col_widths[7], 6, $status, 1, 0, 'C');
+
+    // Kolom 9: Agama
+    $pdf->Cell($col_widths[8], 6, $agama, 1, 0, 'C');
+
+    // Kolom 10: Alamat
+    $pdf->Cell($col_widths[9], 6, $alamat, 1, 0, 'L');
+
+    // Kolom 11: Dusun
+    $pdf->Cell($col_widths[10], 6, $row['nama_dusun'] ?? '-', 1, 0, 'C');
 
     $pdf->Ln();
 }
@@ -312,4 +344,5 @@ $pdf->Cell(0, 5, 'Halaman ' . $pdf->PageNo(), 0, 1, 'C');
 // Output PDF ke browser
 $filename = 'data_kependudukan_' . date('Ymd_His') . '.pdf';
 $pdf->Output($filename, 'I');
+
 exit();

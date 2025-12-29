@@ -1,263 +1,313 @@
 <?php
+// export_excel_phpspreadsheet.php
+require_once __DIR__ . '/../../vendor/autoload.php';
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-// Aktifkan error reporting
-error_reporting(error_level: E_ALL);
-ini_set('display_errors', 1);
-
-require_once '../../vendor/autoload.php';
-
-session_start();
 include_once __DIR__ . '/../../config/config.php';
 
 // Cek apakah user sudah login
-if (!isLoggedIn()) {
-    header("Location: {$base_url}/auth/login.php");
-    exit;
-}
-
-
-// Jika diperlukan role tertentu (admin/kades), sesuaikan dengan kebutuhan
-if ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'kades') {
-    ob_end_clean();
-    header("Location: {$base_url}/auth/role_tidak_cocok.php");
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: {$base_url}auth/login.php");
     exit();
 }
 
+// Filter functionality (sama seperti di list.php)
+$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+$dusun_filter = isset($_GET['dusun']) ? intval($_GET['dusun']) : 0;
+$jk_filter = isset($_GET['jk']) ? $conn->real_escape_string($_GET['jk']) : '';
 
-// Parameter filter yang sama dengan list.php
-$dusun_filter = isset($_GET['dusun']) ? $_GET['dusun'] : '';
-$jk_filter = isset($_GET['jk']) ? $_GET['jk'] : '';
-$search = isset($_GET['search']) ? $_GET['search'] : '';
-
-// Query data kependudukan dengan filter yang sama
 $where_conditions = [];
-$params = [];
-$params_types = '';
 
-if (!empty($dusun_filter)) {
-    $where_conditions[] = "k.DSN = ?";
-    $params[] = $dusun_filter;
-    $params_types .= 'i';
+// Build WHERE conditions
+if ($search) {
+    $where_conditions[] = "(NIK LIKE '%$search%' OR NO_KK LIKE '%$search%' OR NAMA_LGKP LIKE '%$search%' OR NAMA_PANGGILAN LIKE '%$search%' OR ALAMAT LIKE '%$search%')";
 }
 
-if (!empty($jk_filter)) {
-    $where_conditions[] = "k.JK = ?";
-    $params[] = $jk_filter;
-    $params_types .= 's';
+if ($dusun_filter > 0) {
+    $where_conditions[] = "k.DSN = $dusun_filter";
 }
 
-if (!empty($search)) {
-    $where_conditions[] = "(k.NO_KK LIKE ? OR k.NIK LIKE ? OR k.NAMA_LGKP LIKE ?)";
-    $search_term = "%$search%";
-    $params[] = $search_term;
-    $params[] = $search_term;
-    $params[] = $search_term;
-    $params_types .= 'sss';
+if ($jk_filter && in_array($jk_filter, ['L', 'P'])) {
+    $where_conditions[] = "k.JK = '$jk_filter'";
 }
 
-$where_sql = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_conditions) : "";
+// Combine WHERE conditions
+$where = '';
+if (!empty($where_conditions)) {
+    $where = "WHERE " . implode(" AND ", $where_conditions);
+}
 
-// Query utama
-$sql = "SELECT 
-            k.NO_KK,
-            k.NIK,
-            k.NAMA_LGKP,
-            k.NAMA_PANGGILAN,
-            k.HBKEL,
-            k.JK,
-            k.TMPT_LHR,
-            k.TGL_LHR,
-            TIMESTAMPDIFF(YEAR, k.TGL_LHR, CURDATE()) as usia,
-            k.AGAMA,
-            k.STATUS_KAWIN,
-            k.PENDIDIKAN,
-            k.PEKERJAAN,
-            k.DSN,
-            k.rt,
-            k.rw,
-            d.dusun,
-            k.ALAMAT,
-            k.GOL_DARAH,
-            k.KEWARGANEGARAAN,
-            k.STATUS_TINGGAL,
-            k.DISABILITAS,
-            p.jenis_pekerjaan,
-            p.penghasilan_per_bulan,
-            p.status_pekerjaan
-        FROM tabel_kependudukan k
-        LEFT JOIN tabel_dusun d ON k.DSN = d.id
-        LEFT JOIN tabel_pekerjaan p ON k.NIK = p.NIK
-        $where_sql
-        ORDER BY k.NAMA_LGKP";
+// Get all data
+$sql = "SELECT k.*, d.dusun as nama_dusun 
+        FROM tabel_kependudukan k 
+        LEFT JOIN tabel_dusun d ON k.DSN = d.id 
+        $where 
+        ORDER BY k.DSN, k.NAMA_LGKP";
 
-// Eksekusi query dengan prepared statement
-global $conn;
-$data_kependudukan = [];
+$result = $conn->query($sql);
 
-try {
-    if (!empty($params)) {
-        $stmt = $conn->prepare($sql);
-        if ($stmt) {
-            if (!empty($params_types)) {
-                $stmt->bind_param($params_types, ...$params);
-            }
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $data_kependudukan = $result->fetch_all(MYSQLI_ASSOC);
-            $stmt->close();
-        }
+// Create new Spreadsheet
+$spreadsheet = new Spreadsheet();
+$sheet = $spreadsheet->getActiveSheet();
+
+// Set properties
+$spreadsheet->getProperties()
+    ->setCreator('Sistem Kependudukan Desa')
+    ->setLastModifiedBy('Desa Kurniabakti')
+    ->setTitle('Data Kependudukan')
+    ->setSubject('Export Data Penduduk');
+
+// Function untuk format tanggal Indonesia
+function dateIndoExcel($date)
+{
+    if (empty($date)) return '';
+
+    if (strpos($date, '-') !== false) {
+        $pecah = explode('-', $date);
+    } elseif (strpos($date, '/') !== false) {
+        $pecah = explode('/', $date);
     } else {
-        $result = mysqli_query($conn, $sql);
-        if ($result) {
-            $data_kependudukan = mysqli_fetch_all($result, MYSQLI_ASSOC);
-            mysqli_free_result($result);
-        }
+        return $date;
     }
-} catch (Exception $e) {
-    error_log("Database error in Excel export: " . $e->getMessage());
+
+    if (count($pecah) != 3) return $date;
+
+    $bulan = array(
+        1 => 'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember'
+    );
+
+    return $pecah[2] . ' ' . $bulan[(int)$pecah[1]] . ' ' . $pecah[0];
 }
 
-// Clear semua output buffer
-ob_end_clean();
+// Function untuk hitung usia
+function hitungUsiaExcel($tgl_lahir)
+{
+    if (empty($tgl_lahir)) return '';
 
-// **PERBAIKAN: Gunakan file Excel langsung dengan header yang benar**
-$filename = 'data_kependudukan_' . date('Ymd_His') . '.xls';
+    try {
+        $tgl_lahir_dt = new DateTime($tgl_lahir);
+        $today = new DateTime();
+        $usia = $today->diff($tgl_lahir_dt)->y;
+        return $usia . ' tahun';
+    } catch (Exception $e) {
+        return '';
+    }
+}
 
-// Set header untuk Excel (bukan CSV)
-header('Content-Type: application/vnd.ms-excel');
-header('Content-Disposition: attachment; filename="' . $filename . '"');
+// Header utama
+$sheet->mergeCells('A1:Z1');
+$sheet->setCellValue('A1', 'DATA KEPENDUDUKAN');
+$sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+$sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-// Output HTML table untuk Excel
-echo '<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Data Kependudukan</title>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th {
-            background-color: #4F81BD;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            padding: 8px;
-            border: 1px solid #ddd;
-        }
-        td {
-            padding: 6px;
-            border: 1px solid #ddd;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-    </style>
-</head>
-<body>';
+$sheet->mergeCells('A2:Z2');
+$sheet->setCellValue('A2', 'Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya');
+$sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-echo '<h2>LAPORAN DATA KEPENDUDUKAN</h2>';
-echo '<h4>Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya</h4>';
+$sheet->mergeCells('A3:Z3');
+$sheet->setCellValue('A3', 'Telp: (0265) 123456 | Email: desakurniabakti@email.com');
+$sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
 // Informasi filter
+$sheet->mergeCells('A5:Z5');
 $filter_info = [];
-if (!empty($dusun_filter)) {
-    $sql_dusun = "SELECT dusun FROM tabel_dusun WHERE id = ?";
-    $stmt = $conn->prepare($sql_dusun);
-    $stmt->bind_param("i", $dusun_filter);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $dusun_data = $result->fetch_assoc();
-    $nama_dusun = $dusun_data['dusun'] ?? 'Dusun tidak diketahui';
-    $filter_info[] = "Dusun: $nama_dusun";
-    $stmt->close();
+if (!empty($search)) {
+    $filter_info[] = "Pencarian: \"$search\"";
 }
+
+// Get dusun name
+$dusun_nama = 'Semua Dusun';
+if ($dusun_filter > 0) {
+    $sql_dusun = "SELECT dusun FROM tabel_dusun WHERE id = $dusun_filter";
+    $dusun_result = $conn->query($sql_dusun);
+    if ($dusun_result && $dusun_row = $dusun_result->fetch_assoc()) {
+        $dusun_nama = $dusun_row['dusun'];
+    }
+}
+
+$filter_info[] = "Dusun: $dusun_nama";
 
 if (!empty($jk_filter)) {
     $jk_text = ($jk_filter == 'L') ? 'Laki-laki' : 'Perempuan';
     $filter_info[] = "Jenis Kelamin: $jk_text";
+} else {
+    $filter_info[] = "Jenis Kelamin: Semua";
 }
 
-if (!empty($search)) {
-    $filter_info[] = "Kata kunci: \"$search\"";
+$sheet->setCellValue('A5', 'Filter: ' . implode(' | ', $filter_info));
+
+$sheet->mergeCells('A6:Z6');
+$sheet->setCellValue('A6', 'Tanggal Cetak: ' . date('d/m/Y H:i:s'));
+
+// Get statistics
+$total_records = $result->num_rows;
+$total_laki = 0;
+$total_perempuan = 0;
+
+// Hitung statistik dan simpan data
+$data_rows = [];
+while ($row = $result->fetch_assoc()) {
+    $data_rows[] = $row;
+    if ($row['JK'] == 'L') {
+        $total_laki++;
+    } else {
+        $total_perempuan++;
+    }
 }
 
-$filter_text = !empty($filter_info) ? 'Filter: ' . implode(', ', $filter_info) : 'Semua Data';
-echo '<p><strong>' . $filter_text . '</strong></p>';
-echo '<p><strong>Tanggal Cetak:</strong> ' . date('d/m/Y H:i:s') . '</p>';
-echo '<p><strong>Total Data:</strong> ' . count($data_kependudukan) . ' penduduk</p>';
+$sheet->mergeCells('A7:Z7');
+$sheet->setCellValue('A7', 'Total Data: ' . number_format($total_records) .
+    ' | Laki-laki: ' . number_format($total_laki) .
+    ' | Perempuan: ' . number_format($total_perempuan));
 
-// Table header
-echo '<table border="1">
-    <thead>
-        <tr>
-            <th>No</th>
-            <th>No. KK</th>
-            <th>NIK</th>
-            <th>Nama Lengkap</th>
-            <th>Nama Panggilan</th>
-            <th>Hubungan Keluarga</th>
-            <th>Jenis Kelamin</th>
-            <th>Tempat Lahir</th>
-            <th>Tanggal Lahir</th>
-            <th>Usia (Tahun)</th>
-            <th>Agama</th>
-            <th>Status Perkawinan</th>
-            <th>Pendidikan</th>
-            <th>Pekerjaan (KTP)</th>
-            <th>Dusun</th>
-            <th>RT</th>
-            <th>RW</th>
-            <th>Alamat Lengkap</th>
-            <th>Golongan Darah</th>
-            <th>Kewarganegaraan</th>
-            <th>Status Tinggal</th>
-            <th>Disabilitas</th>
-            <th>Jenis Pekerjaan</th>
-            <th>Penghasilan per Bulan</th>
-            <th>Status Pekerjaan</th>
-        </tr>
-    </thead>
-    <tbody>';
+// Header tabel
+$headers = [
+    'No',
+    'NIK',
+    'No. KK',
+    'Nama Lengkap',
+    'Nama Panggilan',
+    'Jenis Kelamin',
+    'Usia',
+    'Tempat Lahir',
+    'Tanggal Lahir',
+    'Agama',
+    'Status Kawin',
+    'Hub. Keluarga',
+    'Pendidikan',
+    'Pekerjaan',
+    'Alamat',
+    'RT',
+    'RW',
+    'Dusun',
+    'Kecamatan',
+    'Kelurahan',
+    'Gol. Darah',
+    'Kewarganegaraan',
+    'Status Tinggal',
+    'Disabilitas',
+    'Jenis Disabilitas',
+    'Tanggal Input'
+];
+
+$row_num = 9;
+$col_num = 1;
+
+// Set header style
+foreach ($headers as $header) {
+    $cell = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col_num) . $row_num;
+    $sheet->setCellValue($cell, $header);
+    $sheet->getStyle($cell)->getFont()->setBold(true);
+    $sheet->getStyle($cell)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFE0E0E0');
+    $sheet->getStyle($cell)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+    $sheet->getStyle($cell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+    $sheet->getStyle($cell)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+    $sheet->getColumnDimension(\PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col_num))->setAutoSize(true);
+    $col_num++;
+}
 
 // Data rows
-if (count($data_kependudukan) > 0) {
-    $no = 1;
-    foreach ($data_kependudukan as $penduduk) {
-        echo '<tr>';
-        echo '<td align="center">' . $no++ . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['NO_KK']) . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['NIK']) . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['NAMA_LGKP']) . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['NAMA_PANGGILAN'] ?? '') . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['HBKEL']) . '</td>';
-        echo '<td align="center">' . ($penduduk['JK'] == 'L' ? 'Laki-laki' : 'Perempuan') . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['TMPT_LHR']) . '</td>';
-        echo '<td>' . (!empty($penduduk['TGL_LHR']) ? date('d/m/Y', strtotime($penduduk['TGL_LHR'])) : '') . '</td>';
-        echo '<td align="center">' . ($penduduk['usia'] ?? '') . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['AGAMA']) . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['STATUS_KAWIN']) . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['PENDIDIKAN']) . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['PEKERJAAN'] ?? '') . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['dusun'] ?? '') . '</td>';
-        echo '<td align="center">' . $penduduk['rt'] . '</td>';
-        echo '<td align="center">' . $penduduk['rw'] . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['ALAMAT'] ?? '') . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['GOL_DARAH'] ?? '') . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['KEWARGANEGARAAN']) . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['STATUS_TINGGAL']) . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['DISABILITAS'] ?? '') . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['jenis_pekerjaan'] ?? '') . '</td>';
-        echo '<td align="right">' . ($penduduk['penghasilan_per_bulan'] > 0 ? number_format($penduduk['penghasilan_per_bulan'], 0, ',', '.') : '') . '</td>';
-        echo '<td>' . htmlspecialchars($penduduk['status_pekerjaan'] ?? '') . '</td>';
-        echo '</tr>';
+$row_num = 10;
+$no = 1;
+
+foreach ($data_rows as $row) {
+    $col_num = 1;
+
+    $sheet->setCellValue([$col_num++, $row_num], $no++);
+    $sheet->setCellValue([$col_num++, $row_num], $row['NIK'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['NO_KK'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['NAMA_LGKP'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['NAMA_PANGGILAN'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['JK'] == 'L' ? 'Laki-laki' : 'Perempuan');
+    $sheet->setCellValue([$col_num++, $row_num], hitungUsiaExcel($row['TGL_LHR'] ?? ''));
+    $sheet->setCellValue([$col_num++, $row_num], $row['TMPT_LHR'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], !empty($row['TGL_LHR']) ? dateIndoExcel($row['TGL_LHR']) : '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['AGAMA'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['STATUS_KAWIN'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['HBKEL'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['PENDIDIKAN'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['PEKERJAAN'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['ALAMAT'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['rt'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['rw'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['nama_dusun'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['KECAMATAN'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['KELURAHAN'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['GOL_DARAH'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['KEWARGANEGARAAN'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['STATUS_TINGGAL'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['DISABILITAS'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], $row['JENIS_DISABILITAS'] ?? '');
+    $sheet->setCellValue([$col_num++, $row_num], !empty($row['created_at']) ? date('d/m/Y H:i', strtotime($row['created_at'])) : '');
+
+    // Set border untuk row
+    for ($i = 1; $i <= 26; $i++) {
+        $cell = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i) . $row_num;
+        $sheet->getStyle($cell)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
     }
-} else {
-    echo '<tr><td colspan="25" align="center">Tidak ada data ditemukan</td></tr>';
+
+    $row_num++;
 }
 
-echo '</tbody></table>';
-echo '</body></html>';
+// Set wrap text untuk kolom tertentu
+$sheet->getStyle('O10:O' . $row_num)->getAlignment()->setWrapText(true);
+
+// Footer dengan TTD
+$ttd_row = $row_num + 3;
+$sheet->mergeCells('V' . $ttd_row . ':Z' . $ttd_row);
+$sheet->setCellValue('V' . $ttd_row, 'Mengetahui,');
+$sheet->getStyle('V' . $ttd_row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+$ttd_row++;
+$sheet->mergeCells('V' . $ttd_row . ':Z' . ($ttd_row + 3));
+$sheet->getStyle('V' . $ttd_row . ':Z' . ($ttd_row + 3))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
+
+$ttd_row += 4;
+$sheet->mergeCells('V' . $ttd_row . ':Z' . $ttd_row);
+$sheet->setCellValue('V' . $ttd_row, 'KEPALA DESA KURNIABAKTI');
+$sheet->getStyle('V' . $ttd_row)->getFont()->setBold(true);
+$sheet->getStyle('V' . $ttd_row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+$ttd_row++;
+$sheet->mergeCells('V' . $ttd_row . ':Z' . $ttd_row);
+$sheet->setCellValue('V' . $ttd_row, 'NAMA KEPALA DESA');
+$sheet->getStyle('V' . $ttd_row)->getFont()->setBold(true)->setUnderline(true);
+$sheet->getStyle('V' . $ttd_row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+$ttd_row++;
+$sheet->mergeCells('V' . $ttd_row . ':Z' . $ttd_row);
+$sheet->setCellValue('V' . $ttd_row, 'NIP. 1234567890123456');
+$sheet->getStyle('V' . $ttd_row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+// Set footer informasi
+$footer_row = $row_num + 15;
+$sheet->mergeCells('A' . $footer_row . ':Z' . $footer_row);
+$sheet->setCellValue('A' . $footer_row, '--- Laporan ini dicetak secara otomatis dari Sistem Administrasi Desa Kurniabakti ---');
+$sheet->getStyle('A' . $footer_row)->getFont()->setItalic(true);
+$sheet->getStyle('A' . $footer_row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+// Output Excel file
+header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+header('Content-Disposition: attachment;filename="data_kependudukan_' . date('Ymd_His') . '.xlsx"');
+header('Cache-Control: max-age=0');
+
+$writer = new Xlsx($spreadsheet);
+$writer->save('php://output');
 exit;

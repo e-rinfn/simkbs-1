@@ -384,12 +384,14 @@ $total_semua_penduduk = count($data_penduduk);
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2>Klasifikasi Data Penduduk</h2>
                     <div class="export-buttons">
-                        <a href="export_klasifikasi_pdf.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-pdf">
-                            <i class="ti ti-file-text"></i> PDF
-                        </a>
-                        <a href="export_klasifikasi_excel.php?<?= http_build_query($_GET) ?>" class="btn btn-excel">
+                        <a href="export_klasifikasi_excel.php?<?= http_build_query($_GET) ?>" class="btn btn-success">
                             <i class="ti ti-file-spreadsheet"></i> Excel
                         </a>
+
+                        <a href="export_klasifikasi_pdf.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-danger">
+                            <i class="ti ti-file-text"></i> PDF
+                        </a>
+
                     </div>
                 </div>
 

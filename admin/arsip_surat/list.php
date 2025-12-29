@@ -792,15 +792,12 @@ $base_url_path_surat = $base_url . '/uploads/surat/';
                                     <span class="text-muted">Total Data: <strong><?= number_format($total_masuk_filtered, 0, ',', '.') ?></strong> surat</span>
                                 </div>
                                 <div class="btn-group">
-                                    <a href="export_surat_masuk_excel.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-excel">
+                                    <a href="export_surat_masuk_excel.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-success">
                                         <i class="ti ti-file-spreadsheet"></i> Excel
                                     </a>
-                                    <a href="export_surat_masuk_pdf.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-pdf">
+                                    <a href="export_surat_masuk_pdf.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-danger">
                                         <i class="ti ti-file-text"></i> PDF
                                     </a>
-                                    <button type="button" class="btn btn-print" onclick="printTable('masuk')">
-                                        <i class="ti ti-printer"></i> Cetak
-                                    </button>
                                 </div>
                             </div>
 
@@ -1096,15 +1093,12 @@ $base_url_path_surat = $base_url . '/uploads/surat/';
                                     <span class="text-muted">Total Data: <strong><?= number_format($total_keluar_filtered, 0, ',', '.') ?></strong> surat</span>
                                 </div>
                                 <div class="btn-group">
-                                    <a href="export_surat_keluar_excel.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-excel">
+                                    <a href="export_surat_keluar_excel.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-success">
                                         <i class="ti ti-file-spreadsheet"></i> Excel
                                     </a>
-                                    <a href="export_surat_keluar_pdf.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-pdf">
+                                    <a href="export_surat_keluar_pdf.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-danger">
                                         <i class="ti ti-file-text"></i> PDF
                                     </a>
-                                    <button type="button" class="btn btn-print" onclick="printTable('keluar')">
-                                        <i class="ti ti-printer"></i> Cetak
-                                    </button>
                                 </div>
                             </div>
 

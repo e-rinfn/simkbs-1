@@ -1,278 +1,5 @@
 <?php
 session_start();
-
-// Koneksi ke database
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$database = 'simkbs_fix';
-
-$conn = mysqli_connect($host, $username, $password, $database);
-
-if (!$conn) {
-    die("Koneksi database gagal: " . mysqli_connect_error());
-}
-
-// Fungsi untuk query database
-function query($sql)
-{
-    global $conn;
-    $result = mysqli_query($conn, $sql);
-    $rows = [];
-    while ($row = mysqli_fetch_assoc($result)) {
-        $rows[] = $row;
-    }
-    return $rows;
-}
-
-// Fungsi untuk mengambil data statistik
-function getStatistics()
-{
-    global $conn;
-
-    $stats = [];
-
-    // Total Penduduk
-    $sql_total = "SELECT COUNT(*) as total FROM tabel_kependudukan";
-    $result = mysqli_query($conn, $sql_total);
-    $stats['total_penduduk'] = mysqli_fetch_assoc($result)['total'];
-
-    // Jenis Kelamin
-    $sql_laki = "SELECT COUNT(*) as total FROM tabel_kependudukan WHERE JK = 'L'";
-    $result = mysqli_query($conn, $sql_laki);
-    $stats['laki_laki'] = mysqli_fetch_assoc($result)['total'];
-
-    $sql_perempuan = "SELECT COUNT(*) as total FROM tabel_kependudukan WHERE JK = 'P'";
-    $result = mysqli_query($conn, $sql_perempuan);
-    $stats['perempuan'] = mysqli_fetch_assoc($result)['total'];
-
-    // Persentase
-    if ($stats['total_penduduk'] > 0) {
-        $stats['persen_laki'] = round(($stats['laki_laki'] / $stats['total_penduduk']) * 100, 1);
-        $stats['persen_perempuan'] = round(($stats['perempuan'] / $stats['total_penduduk']) * 100, 1);
-    } else {
-        $stats['persen_laki'] = 0;
-        $stats['persen_perempuan'] = 0;
-    }
-
-    return $stats;
-}
-
-// Fungsi untuk data status kawin
-function getStatusKawin()
-{
-    $sql = "SELECT 
-            SUM(CASE WHEN STATUS_KAWIN = 'KAWIN' THEN 1 ELSE 0 END) as kawin,
-            SUM(CASE WHEN STATUS_KAWIN = 'BELUM KAWIN' THEN 1 ELSE 0 END) as belum_kawin,
-            SUM(CASE WHEN STATUS_KAWIN IN ('CERAI HIDUP', 'CERAI MATI') THEN 1 ELSE 0 END) as janda_duda,
-            COUNT(*) as total
-            FROM tabel_kependudukan";
-    $result = query($sql);
-
-    if (!empty($result)) {
-        $data = $result[0];
-        if ($data['total'] > 0) {
-            $data['persen_kawin'] = round(($data['kawin'] / $data['total']) * 100, 1);
-            $data['persen_belum_kawin'] = round(($data['belum_kawin'] / $data['total']) * 100, 1);
-            $data['persen_janda_duda'] = round(($data['janda_duda'] / $data['total']) * 100, 1);
-        } else {
-            $data['persen_kawin'] = $data['persen_belum_kawin'] = $data['persen_janda_duda'] = 0;
-        }
-        return $data;
-    }
-    return null;
-}
-
-// Fungsi untuk data pendidikan
-function getPendidikan()
-{
-    $sql = "SELECT PENDIDIKAN, COUNT(*) as jumlah 
-            FROM tabel_kependudukan 
-            WHERE PENDIDIKAN IS NOT NULL 
-            GROUP BY PENDIDIKAN";
-    $data = query($sql);
-
-    // Hitung total
-    $sql_total = "SELECT COUNT(*) as total FROM tabel_kependudukan WHERE PENDIDIKAN IS NOT NULL";
-    $result = query($sql_total);
-    $total = $result[0]['total'];
-
-    $pendidikan_data = [];
-    foreach ($data as $row) {
-        $pendidikan_data[$row['PENDIDIKAN']] = [
-            'jumlah' => $row['jumlah'],
-            'persen' => $total > 0 ? round(($row['jumlah'] / $total) * 100, 1) : 0
-        ];
-    }
-
-    return $pendidikan_data;
-}
-
-// Fungsi untuk data pekerjaan
-function getPekerjaan()
-{
-    $sql = "SELECT PEKERJAAN, COUNT(*) as jumlah 
-            FROM tabel_kependudukan 
-            WHERE PEKERJAAN IS NOT NULL AND PEKERJAAN != '' 
-            GROUP BY PEKERJAAN 
-            ORDER BY jumlah DESC 
-            LIMIT 10";
-    $data = query($sql);
-
-    // Hitung total
-    $sql_total = "SELECT COUNT(*) as total FROM tabel_kependudukan WHERE PEKERJAAN IS NOT NULL AND PEKERJAAN != ''";
-    $result = query($sql_total);
-    $total = $result[0]['total'];
-
-    $pekerjaan_data = [];
-    foreach ($data as $row) {
-        $pekerjaan_data[$row['PEKERJAAN']] = [
-            'jumlah' => $row['jumlah'],
-            'persen' => $total > 0 ? round(($row['jumlah'] / $total) * 100, 1) : 0
-        ];
-    }
-
-    return $pekerjaan_data;
-}
-
-// Fungsi untuk data kelompok umur
-function getKelompokUmur()
-{
-    $sql = "SELECT 
-            SUM(CASE WHEN TIMESTAMPDIFF(YEAR, TGL_LHR, CURDATE()) BETWEEN 0 AND 14 THEN 1 ELSE 0 END) as usia_0_14,
-            SUM(CASE WHEN TIMESTAMPDIFF(YEAR, TGL_LHR, CURDATE()) BETWEEN 15 AND 64 THEN 1 ELSE 0 END) as usia_15_64,
-            SUM(CASE WHEN TIMESTAMPDIFF(YEAR, TGL_LHR, CURDATE()) >= 65 THEN 1 ELSE 0 END) as usia_65_plus,
-            AVG(TIMESTAMPDIFF(YEAR, TGL_LHR, CURDATE())) as rata_umur,
-            COUNT(*) as total
-            FROM tabel_kependudukan";
-    $result = query($sql);
-
-    if (!empty($result)) {
-        $data = $result[0];
-        if ($data['total'] > 0) {
-            $data['persen_0_14'] = round(($data['usia_0_14'] / $data['total']) * 100, 1);
-            $data['persen_15_64'] = round(($data['usia_15_64'] / $data['total']) * 100, 1);
-            $data['persen_65_plus'] = round(($data['usia_65_plus'] / $data['total']) * 100, 1);
-            $data['rata_umur'] = round($data['rata_umur'], 1);
-        } else {
-            $data['persen_0_14'] = $data['persen_15_64'] = $data['persen_65_plus'] = 0;
-            $data['rata_umur'] = 0;
-        }
-        return $data;
-    }
-    return null;
-}
-
-// Fungsi untuk data agama
-function getAgama()
-{
-    $sql = "SELECT AGAMA, COUNT(*) as jumlah 
-            FROM tabel_kependudukan 
-            GROUP BY AGAMA 
-            ORDER BY jumlah DESC";
-    $data = query($sql);
-
-    // Hitung total
-    $sql_total = "SELECT COUNT(*) as total FROM tabel_kependudukan";
-    $result = query($sql_total);
-    $total = $result[0]['total'];
-
-    $agama_data = [];
-    foreach ($data as $row) {
-        $agama_data[$row['AGAMA']] = [
-            'jumlah' => $row['jumlah'],
-            'persen' => $total > 0 ? round(($row['jumlah'] / $total) * 100, 1) : 0
-        ];
-    }
-
-    return $agama_data;
-}
-
-// Fungsi untuk data dusun
-function getDusunData()
-{
-    $sql = "SELECT 
-            d.dusun as nama_dusun,
-            d.id,
-            COUNT(k.id) as jumlah_penduduk,
-            COUNT(DISTINCT k.NO_KK) as jumlah_kk
-            FROM tabel_dusun d
-            LEFT JOIN tabel_kependudukan k ON d.id = k.DSN
-            GROUP BY d.id, d.dusun
-            ORDER BY jumlah_penduduk DESC";
-    $data = query($sql);
-
-    // Hitung total untuk persentase
-    $sql_total = "SELECT COUNT(*) as total FROM tabel_kependudukan";
-    $result = query($sql_total);
-    $total_penduduk = $result[0]['total'];
-
-    foreach ($data as &$dusun) {
-        $dusun['persen'] = $total_penduduk > 0 ? round(($dusun['jumlah_penduduk'] / $total_penduduk) * 100, 1) : 0;
-    }
-
-    return $data;
-}
-
-// Ambil semua data
-$stats = getStatistics();
-$status_kawin = getStatusKawin();
-$pendidikan = getPendidikan();
-$pekerjaan = getPekerjaan();
-$kelompok_umur = getKelompokUmur();
-$agama = getAgama();
-$dusun_data = getDusunData();
-
-// Total KK (Keluarga)
-$sql_kk = "SELECT COUNT(DISTINCT NO_KK) as total_kk FROM tabel_kependudukan";
-$result_kk = query($sql_kk);
-$total_kk = $result_kk[0]['total_kk'] ?? 0;
-
-// Total Dusun
-$sql_dusun_total = "SELECT COUNT(*) as total_dusun FROM tabel_dusun";
-$result_dusun = query($sql_dusun_total);
-$total_dusun = $result_dusun[0]['total_dusun'] ?? 0;
-
-// Data pekerjaan untuk mapping icon
-$pekerjaan_icons = [
-    'PETANI' => 'fas fa-seedling',
-    'WIRASWASTA' => 'fas fa-store',
-    'PNS' => 'fas fa-user-tie',
-    'TNI' => 'fas fa-user-tie',
-    'POLRI' => 'fas fa-user-tie',
-    'BURUH' => 'fas fa-hard-hat',
-    'PELAJAR/MAHASISWA' => 'fas fa-user-graduate',
-    'GURU' => 'fas fa-chalkboard-teacher',
-    'DOKTER' => 'fas fa-user-md',
-    'PERAWAT' => 'fas fa-user-nurse',
-    'PEGAWAI SWASTA' => 'fas fa-briefcase',
-    'IBU RUMAH TANGGA' => 'fas fa-home',
-    'SOPIR' => 'fas fa-car',
-    'PENGUSAHA' => 'fas fa-chart-line',
-    'NELAYAN' => 'fas fa-fish'
-];
-
-// Data agama untuk mapping icon
-$agama_icons = [
-    'ISLAM' => 'fas fa-mosque',
-    'KRISTEN' => 'fas fa-church',
-    'KATOLIK' => 'fas fa-cross',
-    'HINDU' => 'fas fa-om',
-    'BUDDHA' => 'fas fa-yin-yang',
-    'KONGHUCU' => 'fas fa-torii-gate'
-];
-
-// Data pendidikan untuk mapping icon
-$pendidikan_icons = [
-    'TIDAK/BELUM SEKOLAH' => 'fas fa-book',
-    'SD/SEDERAJAT' => 'fas fa-graduation-cap',
-    'SMP/SEDERAJAT' => 'fas fa-school',
-    'SMA/SEDERAJAT' => 'fas fa-university',
-    'D1/D2/D3' => 'fas fa-user-graduate',
-    'S1' => 'fas fa-user-graduate',
-    'S2' => 'fas fa-user-graduate',
-    'S3' => 'fas fa-user-graduate'
-];
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -761,6 +488,7 @@ $pendidikan_icons = [
                 <span>SIKDES</span>
             </a>
 
+
             <!-- Mobile Toggle Button -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -813,26 +541,31 @@ $pendidikan_icons = [
                         <p class="hero-subtitle">
                             Sistem Informasi Kependudukan Desa atau bisa disingkat SIKDES merupakan
                             suatu sistem yang dapat mengolah data kependudukan yang berada di Desa Kurniabakti
-                            menjadi Data Klasifikasi kependudukan.
+                            menjadi Data Klasifikasi kependudukan..
                         </p>
                         <div class="hero-stats">
                             <div class="stat-item">
-                                <span class="stat-number" id="totalPenduduk"><?php echo number_format($stats['total_penduduk']); ?></span>
+                                <span class="stat-number">15,234</span>
                                 <span class="stat-label">Jiwa</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-number" id="totalKK"><?php echo number_format($total_kk); ?></span>
+                                <span class="stat-number">4,209</span>
                                 <span class="stat-label">Keluarga</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-number" id="totalDusun"><?php echo number_format($total_dusun); ?></span>
+                                <span class="stat-number">8</span>
                                 <span class="stat-label">Dusun</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <!-- Placeholder untuk ilustrasi -->
+                    <!-- <div class="text-center">
+                        <img src="https://via.placeholder.com/500x400/1a2980/26d0ce?text=Ilustrasi+Kependudukan"
+                            alt="Ilustrasi Kependudukan"
+                            class="img-fluid rounded-3 shadow-lg"
+                            style="max-width: 90%;">
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -854,7 +587,7 @@ $pendidikan_icons = [
                             <i class="fas fa-users"></i>
                         </div>
                         <h5 class="card-title">Total Penduduk</h5>
-                        <span class="stat-number-card"><?php echo number_format($stats['total_penduduk']); ?></span>
+                        <span class="stat-number-card">15,234</span>
                         <p class="card-text">Jiwa terdaftar dalam sistem</p>
                     </div>
                 </div>
@@ -866,13 +599,13 @@ $pendidikan_icons = [
                             <i class="fas fa-male"></i>
                         </div>
                         <h5 class="card-title">Laki-laki</h5>
-                        <span class="stat-number-card"><?php echo number_format($stats['laki_laki']); ?></span>
+                        <span class="stat-number-card">7,512</span>
                         <div class="progress-container">
                             <div class="progress-label">
-                                <span><?php echo $stats['persen_laki']; ?>%</span>
+                                <span>49.3%</span>
                             </div>
                             <div class="progress">
-                                <div class="progress-bar bg-primary" style="width: <?php echo $stats['persen_laki']; ?>%"></div>
+                                <div class="progress-bar bg-primary" style="width: 49.3%"></div>
                             </div>
                         </div>
                     </div>
@@ -885,13 +618,13 @@ $pendidikan_icons = [
                             <i class="fas fa-female"></i>
                         </div>
                         <h5 class="card-title">Perempuan</h5>
-                        <span class="stat-number-card"><?php echo number_format($stats['perempuan']); ?></span>
+                        <span class="stat-number-card">7,722</span>
                         <div class="progress-container">
                             <div class="progress-label">
-                                <span><?php echo $stats['persen_perempuan']; ?>%</span>
+                                <span>50.7%</span>
                             </div>
                             <div class="progress">
-                                <div class="progress-bar" style="background-color: #e74c3c; width: <?php echo $stats['persen_perempuan']; ?>%"></div>
+                                <div class="progress-bar" style="background-color: #e74c3c; width: 50.7%"></div>
                             </div>
                         </div>
                     </div>
@@ -905,31 +638,29 @@ $pendidikan_icons = [
                         </div>
                         <h5 class="card-title">Status Perkawinan</h5>
                         <div class="progress-container">
-                            <?php if ($status_kawin): ?>
-                                <div class="progress-label">
-                                    <span>Kawin</span>
-                                    <span><?php echo $status_kawin['persen_kawin']; ?>%</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar bg-success" style="width: <?php echo $status_kawin['persen_kawin']; ?>%"></div>
-                                </div>
+                            <div class="progress-label">
+                                <span>Kawin</span>
+                                <span>68%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 68%"></div>
+                            </div>
 
-                                <div class="progress-label mt-3">
-                                    <span>Belum Kawin</span>
-                                    <span><?php echo $status_kawin['persen_belum_kawin']; ?>%</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar bg-warning" style="width: <?php echo $status_kawin['persen_belum_kawin']; ?>%"></div>
-                                </div>
+                            <div class="progress-label mt-3">
+                                <span>Belum Kawin</span>
+                                <span>25%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 25%"></div>
+                            </div>
 
-                                <div class="progress-label mt-3">
-                                    <span>Janda/Duda</span>
-                                    <span><?php echo $status_kawin['persen_janda_duda']; ?>%</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar bg-secondary" style="width: <?php echo $status_kawin['persen_janda_duda']; ?>%"></div>
-                                </div>
-                            <?php endif; ?>
+                            <div class="progress-label mt-3">
+                                <span>Janda/Duda</span>
+                                <span>7%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-secondary" style="width: 7%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -946,41 +677,100 @@ $pendidikan_icons = [
             </div>
 
             <div class="row g-4">
-                <?php
-                $pendidikan_labels = [
-                    'TIDAK/BELUM SEKOLAH' => 'Tidak/Belum Sekolah',
-                    'SD/SEDERAJAT' => 'SD/Sederajat',
-                    'SMP/SEDERAJAT' => 'SMP/Sederajat',
-                    'SMA/SEDERAJAT' => 'SMA/Sederajat',
-                    'D1/D2/D3' => 'D1/D2/D3',
-                    'S1' => 'S1',
-                    'S2' => 'S2',
-                    'S3' => 'S3'
-                ];
-
-                foreach ($pendidikan_labels as $key => $label):
-                    $data = $pendidikan[$key] ?? ['jumlah' => 0, 'persen' => 0];
-                    $icon = $pendidikan_icons[$key] ?? 'fas fa-graduation-cap';
-                ?>
-                    <div class="col-md-3 col-sm-6">
-                        <div class="info-card">
-                            <div class="card-icon <?php echo $key == 'S1' || $key == 'S2' || $key == 'S3' ? 'primary' : ($key == 'TIDAK/BELUM SEKOLAH' ? '' : 'warning'); ?>">
-                                <i class="<?php echo $icon; ?>"></i>
+                <!-- SD -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h5 class="card-title">SD/Sederajat</h5>
+                        <span class="stat-number-card">4,890</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>32.1%</span>
                             </div>
-                            <h5 class="card-title"><?php echo $label; ?></h5>
-                            <span class="stat-number-card"><?php echo number_format($data['jumlah']); ?></span>
-                            <div class="progress-container">
-                                <div class="progress-label">
-                                    <span><?php echo $data['persen']; ?>%</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar <?php echo $key == 'S1' || $key == 'S2' || $key == 'S3' ? 'bg-primary' : ($key == 'TIDAK/BELUM SEKOLAH' ? 'bg-secondary' : 'bg-warning'); ?>"
-                                        style="width: <?php echo $data['persen']; ?>%"></div>
-                                </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 32.1%"></div>
                             </div>
                         </div>
                     </div>
-                <?php endforeach; ?>
+                </div>
+
+                <!-- SMP -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-school"></i>
+                        </div>
+                        <h5 class="card-title">SMP/Sederajat</h5>
+                        <span class="stat-number-card">3,567</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>23.4%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 23.4%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SMA -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon success">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <h5 class="card-title">SMA/Sederajat</h5>
+                        <span class="stat-number-card">3,245</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>21.3%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 21.3%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Perguruan Tinggi -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h5 class="card-title">Perguruan Tinggi</h5>
+                        <span class="stat-number-card">1,872</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>12.3%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: 12.3%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tidak Sekolah -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h5 class="card-title">Tidak/Belum Sekolah</h5>
+                        <span class="stat-number-card">1,660</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>10.9%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-secondary" style="width: 10.9%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -994,62 +784,119 @@ $pendidikan_icons = [
             </div>
 
             <div class="row g-4">
-                <?php
-                // Tampilkan 6 pekerjaan teratas
-                $counter = 0;
-                $color_classes = ['success', 'warning', 'primary', '', 'primary', 'secondary'];
-
-                foreach ($pekerjaan as $key => $data):
-                    if ($counter >= 6) break;
-                    $icon = $pekerjaan_icons[strtoupper($key)] ?? 'fas fa-briefcase';
-                    $color_class = $color_classes[$counter % count($color_classes)];
-                ?>
-                    <div class="col-md-4 col-sm-6">
-                        <div class="info-card">
-                            <div class="card-icon <?php echo $color_class; ?>">
-                                <i class="<?php echo $icon; ?>"></i>
+                <!-- Petani -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon success">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <h5 class="card-title">Petani</h5>
+                        <span class="stat-number-card">3,245</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>31.2%</span>
                             </div>
-                            <h5 class="card-title"><?php echo $key; ?></h5>
-                            <span class="stat-number-card"><?php echo number_format($data['jumlah']); ?></span>
-                            <div class="progress-container">
-                                <div class="progress-label">
-                                    <span><?php echo $data['persen']; ?>%</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar <?php echo $color_class ? 'bg-' . $color_class : 'bg-info'; ?>"
-                                        style="width: <?php echo $data['persen']; ?>%"></div>
-                                </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 31.2%"></div>
                             </div>
                         </div>
                     </div>
-                <?php
-                    $counter++;
-                endforeach;
+                </div>
 
-                // Jika kurang dari 6, tampilkan placeholder
-                while ($counter < 6):
-                ?>
-                    <div class="col-md-4 col-sm-6">
-                        <div class="info-card">
-                            <div class="card-icon secondary">
-                                <i class="fas fa-ellipsis-h"></i>
+                <!-- Wiraswasta -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <h5 class="card-title">Wiraswasta</h5>
+                        <span class="stat-number-card">2,567</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>24.7%</span>
                             </div>
-                            <h5 class="card-title">Lainnya</h5>
-                            <span class="stat-number-card">0</span>
-                            <div class="progress-container">
-                                <div class="progress-label">
-                                    <span>0%</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar bg-secondary" style="width: 0%"></div>
-                                </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 24.7%"></div>
                             </div>
                         </div>
                     </div>
-                <?php
-                    $counter++;
-                endwhile;
-                ?>
+                </div>
+
+                <!-- PNS -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5 class="card-title">PNS/TNI/POLRI</h5>
+                        <span class="stat-number-card">987</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>9.5%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: 9.5%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buruh -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-hard-hat"></i>
+                        </div>
+                        <h5 class="card-title">Buruh</h5>
+                        <span class="stat-number-card">1,234</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>11.9%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="background-color: #8e44ad; width: 11.9%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pelajar/Mahasiswa -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h5 class="card-title">Pelajar/Mahasiswa</h5>
+                        <span class="stat-number-card">1,567</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>15.1%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: 15.1%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lainnya -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon secondary">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                        <h5 class="card-title">Lainnya</h5>
+                        <span class="stat-number-card">789</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>7.6%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-secondary" style="width: 7.6%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -1063,107 +910,105 @@ $pendidikan_icons = [
             </div>
 
             <div class="row g-4">
-                <?php if ($kelompok_umur): ?>
-                    <!-- 0-14 Tahun -->
-                    <div class="col-md-4 col-sm-6">
-                        <div class="info-card">
-                            <div class="card-icon primary">
-                                <i class="fas fa-baby"></i>
-                            </div>
-                            <h5 class="card-title">0-14 Tahun</h5>
-                            <span class="stat-number-card"><?php echo number_format($kelompok_umur['usia_0_14']); ?></span>
-                            <div class="progress-container">
-                                <div class="progress-label">
-                                    <span><?php echo $kelompok_umur['persen_0_14']; ?>%</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar bg-primary" style="width: <?php echo $kelompok_umur['persen_0_14']; ?>%"></div>
-                                </div>
-                            </div>
-                            <p class="card-text">Anak-anak dan remaja awal</p>
+                <!-- 0-14 Tahun -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-baby"></i>
                         </div>
+                        <h5 class="card-title">0-14 Tahun</h5>
+                        <span class="stat-number-card">3,456</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>22.7%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: 22.7%"></div>
+                            </div>
+                        </div>
+                        <p class="card-text">Anak-anak dan remaja awal</p>
                     </div>
+                </div>
 
-                    <!-- 15-64 Tahun -->
-                    <div class="col-md-4 col-sm-6">
-                        <div class="info-card">
-                            <div class="card-icon success">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <h5 class="card-title">15-64 Tahun</h5>
-                            <span class="stat-number-card"><?php echo number_format($kelompok_umur['usia_15_64']); ?></span>
-                            <div class="progress-container">
-                                <div class="progress-label">
-                                    <span><?php echo $kelompok_umur['persen_15_64']; ?>%</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar bg-success" style="width: <?php echo $kelompok_umur['persen_15_64']; ?>%"></div>
-                                </div>
-                            </div>
-                            <p class="card-text">Usia produktif</p>
+                <!-- 15-64 Tahun -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon success">
+                            <i class="fas fa-user"></i>
                         </div>
+                        <h5 class="card-title">15-64 Tahun</h5>
+                        <span class="stat-number-card">10,123</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>66.5%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 66.5%"></div>
+                            </div>
+                        </div>
+                        <p class="card-text">Usia produktif</p>
                     </div>
+                </div>
 
-                    <!-- 65+ Tahun -->
-                    <div class="col-md-4 col-sm-6">
-                        <div class="info-card">
-                            <div class="card-icon">
-                                <i class="fas fa-user-friends"></i>
-                            </div>
-                            <h5 class="card-title">65+ Tahun</h5>
-                            <span class="stat-number-card"><?php echo number_format($kelompok_umur['usia_65_plus']); ?></span>
-                            <div class="progress-container">
-                                <div class="progress-label">
-                                    <span><?php echo $kelompok_umur['persen_65_plus']; ?>%</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar" style="background-color: #8e44ad; width: <?php echo $kelompok_umur['persen_65_plus']; ?>%"></div>
-                                </div>
-                            </div>
-                            <p class="card-text">Lansia</p>
+                <!-- 65+ Tahun -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-user-friends"></i>
                         </div>
+                        <h5 class="card-title">65+ Tahun</h5>
+                        <span class="stat-number-card">1,655</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>10.8%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="background-color: #8e44ad; width: 10.8%"></div>
+                            </div>
+                        </div>
+                        <p class="card-text">Lansia</p>
                     </div>
+                </div>
 
-                    <!-- Rata-rata Umur -->
-                    <div class="col-md-6">
-                        <div class="info-card">
-                            <div class="card-icon warning">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <h5 class="card-title">Rata-rata Umur</h5>
-                            <span class="stat-number-card"><?php echo $kelompok_umur['rata_umur']; ?> Tahun</span>
-                            <div class="progress-container">
-                                <div class="progress-label">
-                                    <span>Usia Median</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar bg-warning" style="width: <?php echo min(100, $kelompok_umur['rata_umur']); ?>%"></div>
-                                </div>
-                            </div>
-                            <p class="card-text">Mayoritas penduduk berada dalam usia produktif</p>
+                <!-- Rata-rata Umur -->
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-chart-line"></i>
                         </div>
+                        <h5 class="card-title">Rata-rata Umur</h5>
+                        <span class="stat-number-card">32.5 Tahun</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Usia Median</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <p class="card-text">Mayoritas penduduk berada dalam usia produktif</p>
                     </div>
+                </div>
 
-                    <!-- Kepadatan Penduduk -->
-                    <div class="col-md-6">
-                        <div class="info-card">
-                            <div class="card-icon danger">
-                                <i class="fas fa-map-marked-alt"></i>
-                            </div>
-                            <h5 class="card-title">Kepadatan Penduduk</h5>
-                            <span class="stat-number-card"><?php echo round($stats['total_penduduk'] / 12.5, 0); ?>/km²</span>
-                            <div class="progress-container">
-                                <div class="progress-label">
-                                    <span>Kepadatan sedang</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar" style="background-color: #e74c3c; width: 75%"></div>
-                                </div>
-                            </div>
-                            <p class="card-text">Distribusi merata di seluruh wilayah desa</p>
+                <!-- Kepadatan Penduduk -->
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <div class="card-icon danger">
+                            <i class="fas fa-map-marked-alt"></i>
                         </div>
+                        <h5 class="card-title">Kepadatan Penduduk</h5>
+                        <span class="stat-number-card">1,245/km²</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Kepadatan sedang</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="background-color: #e74c3c; width: 75%"></div>
+                            </div>
+                        </div>
+                        <p class="card-text">Distribusi merata di seluruh wilayah desa</p>
                     </div>
-                <?php endif; ?>
+                </div>
             </div>
         </div>
     </section>
@@ -1177,46 +1022,119 @@ $pendidikan_icons = [
             </div>
 
             <div class="row g-4">
-                <?php
-                $agama_labels = [
-                    'ISLAM' => 'Islam',
-                    'KRISTEN' => 'Kristen',
-                    'KATOLIK' => 'Katolik',
-                    'HINDU' => 'Hindu',
-                    'BUDDHA' => 'Buddha',
-                    'KONGHUCU' => 'Konghucu'
-                ];
-
-                $counter = 0;
-                $color_classes = ['primary', 'warning', '', 'danger', 'success', 'secondary'];
-
-                foreach ($agama_labels as $key => $label):
-                    $data = $agama[$key] ?? ['jumlah' => 0, 'persen' => 0];
-                    $icon = $agama_icons[$key] ?? 'fas fa-church';
-                    $color_class = $color_classes[$counter % count($color_classes)];
-                ?>
-                    <div class="col-md-4 col-sm-6">
-                        <div class="info-card">
-                            <div class="card-icon <?php echo $color_class; ?>">
-                                <i class="<?php echo $icon; ?>"></i>
+                <!-- Islam -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-mosque"></i>
+                        </div>
+                        <h5 class="card-title">Islam</h5>
+                        <span class="stat-number-card">12,345</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>81.0%</span>
                             </div>
-                            <h5 class="card-title"><?php echo $label; ?></h5>
-                            <span class="stat-number-card"><?php echo number_format($data['jumlah']); ?></span>
-                            <div class="progress-container">
-                                <div class="progress-label">
-                                    <span><?php echo $data['persen']; ?>%</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar <?php echo $color_class ? 'bg-' . $color_class : 'bg-info'; ?>"
-                                        style="width: <?php echo $data['persen']; ?>%"></div>
-                                </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: 81%"></div>
                             </div>
                         </div>
                     </div>
-                <?php
-                    $counter++;
-                endforeach;
-                ?>
+                </div>
+
+                <!-- Kristen -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-church"></i>
+                        </div>
+                        <h5 class="card-title">Kristen</h5>
+                        <span class="stat-number-card">1,567</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>10.3%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 10.3%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Katolik -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-cross"></i>
+                        </div>
+                        <h5 class="card-title">Katolik</h5>
+                        <span class="stat-number-card">876</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>5.8%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="background-color: #8e44ad; width: 5.8%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hindu -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon danger">
+                            <i class="fas fa-om"></i>
+                        </div>
+                        <h5 class="card-title">Hindu</h5>
+                        <span class="stat-number-card">234</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>1.5%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="background-color: #e74c3c; width: 1.5%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buddha -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon success">
+                            <i class="fas fa-yin-yang"></i>
+                        </div>
+                        <h5 class="card-title">Buddha</h5>
+                        <span class="stat-number-card">156</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>1.0%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 1%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Konghucu -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-torii-gate"></i>
+                        </div>
+                        <h5 class="card-title">Konghucu</h5>
+                        <span class="stat-number-card">56</span>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>0.4%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-secondary" style="width: 0.4%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -1230,48 +1148,125 @@ $pendidikan_icons = [
             </div>
 
             <div class="row g-4">
-                <?php if (!empty($dusun_data)): ?>
-                    <?php
-                    $dusun_icons = [
-                        'fas fa-home',
-                        'fas fa-tree',
-                        'fas fa-water',
-                        'fas fa-mountain',
-                        'fas fa-sun',
-                        'fas fa-seedling',
-                        'fas fa-fish',
-                        'fas fa-star',
-                        'fas fa-building',
-                        'fas fa-warehouse',
-                        'fas fa-store',
-                        'fas fa-school'
-                    ];
-
-                    $dusun_colors = ['bg-primary', 'bg-success', 'bg-warning', '', 'bg-info', 'bg-success', 'bg-primary', 'bg-warning'];
-
-                    foreach ($dusun_data as $index => $dusun):
-                        $icon = $dusun_icons[$index % count($dusun_icons)] ?? 'fas fa-home';
-                        $color = $dusun_colors[$index % count($dusun_colors)] ?? 'bg-primary';
-                    ?>
-                        <div class="col-lg-3 col-md-4 col-sm-6">
-                            <div class="dusun-card">
-                                <div class="dusun-icon">
-                                    <i class="<?php echo $icon; ?>"></i>
-                                </div>
-                                <h5 class="dusun-name"><?php echo htmlspecialchars($dusun['nama_dusun']); ?></h5>
-                                <div class="dusun-population"><?php echo number_format($dusun['jumlah_penduduk']); ?></div>
-                                <p>Jiwa • <?php echo number_format($dusun['jumlah_kk']); ?> KK</p>
-                                <div class="progress mt-3">
-                                    <div class="progress-bar <?php echo $color; ?>" style="width: <?php echo $dusun['persen']; ?>%"></div>
-                                </div>
-                            </div>
+                <!-- Dusun 1 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-home"></i>
                         </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="col-12 text-center">
-                        <p class="text-muted">Data dusun belum tersedia</p>
+                        <h5 class="dusun-name">Dusun Krajan</h5>
+                        <div class="dusun-population">2,345</div>
+                        <p>Jiwa • 425 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-primary" style="width: 15.4%"></div>
+                        </div>
                     </div>
-                <?php endif; ?>
+                </div>
+
+                <!-- Dusun 2 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Sumber</h5>
+                        <div class="dusun-population">2,123</div>
+                        <p>Jiwa • 389 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-success" style="width: 13.9%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 3 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-water"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Kaligondo</h5>
+                        <div class="dusun-population">1,987</div>
+                        <p>Jiwa • 356 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-warning" style="width: 13.0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 4 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-mountain"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Gunungsari</h5>
+                        <div class="dusun-population">1,845</div>
+                        <p>Jiwa • 332 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar" style="background-color: #8e44ad; width: 12.1%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 5 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-sun"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Surya</h5>
+                        <div class="dusun-population">1,723</div>
+                        <p>Jiwa • 312 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-info" style="width: 11.3%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 6 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Tani</h5>
+                        <div class="dusun-population">1,645</div>
+                        <p>Jiwa • 298 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-success" style="width: 10.8%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 7 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-fish"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Mina</h5>
+                        <div class="dusun-population">1,512</div>
+                        <p>Jiwa • 274 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-primary" style="width: 9.9%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dusun 8 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="dusun-card">
+                        <div class="dusun-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h5 class="dusun-name">Dusun Bintang</h5>
+                        <div class="dusun-population">1,432</div>
+                        <p>Jiwa • 260 KK</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-warning" style="width: 9.4%"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -1471,7 +1466,26 @@ $pendidikan_icons = [
             });
         });
 
-        // Animate counter numbers
+        // Initialize animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animated');
+                }
+            });
+        }, observerOptions);
+
+        // Observe cards for animation
+        document.querySelectorAll('.info-card, .dusun-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Animate counter numbers (contoh implementasi)
         function animateCounter(element, target, duration = 2000) {
             const start = 0;
             const increment = target / (duration / 16);
@@ -1494,8 +1508,7 @@ $pendidikan_icons = [
                 if (entry.isIntersecting) {
                     const counters = entry.target.querySelectorAll('.stat-number-card, .stat-number, .dusun-population');
                     counters.forEach(counter => {
-                        const text = counter.textContent.replace(/,/g, '');
-                        const target = parseInt(text);
+                        const target = parseInt(counter.textContent.replace(/,/g, ''));
                         if (!isNaN(target)) {
                             animateCounter(counter, target);
                         }
@@ -1510,23 +1523,7 @@ $pendidikan_icons = [
         document.querySelectorAll('section').forEach(section => {
             counterObserver.observe(section);
         });
-
-        // Animate hero stats on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const heroStats = document.querySelectorAll('.hero-stats .stat-number');
-            heroStats.forEach(stat => {
-                const text = stat.textContent.replace(/,/g, '');
-                const target = parseInt(text);
-                if (!isNaN(target)) {
-                    animateCounter(stat, target, 1500);
-                }
-            });
-        });
     </script>
 </body>
 
 </html>
-<?php
-// Tutup koneksi database
-mysqli_close($conn);
-?>
