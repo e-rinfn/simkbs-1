@@ -374,9 +374,9 @@ $pdf->SetX($ttdX);
 $pdf->SetFont('helvetica', 'BU', 10);
 $pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
 
-$pdf->SetX($ttdX);
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
+// $pdf->SetX($ttdX);
+// $pdf->SetFont('helvetica', '', 9);
+// $pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
 
 
 
@@ -516,9 +516,9 @@ $pdf->SetX($ttdX);
 $pdf->SetFont('helvetica', 'BU', 10);
 $pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
 
-$pdf->SetX($ttdX);
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
+// $pdf->SetX($ttdX);
+// $pdf->SetFont('helvetica', '', 9);
+// $pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
 
 
 // **TABEL 4: Ringkasan Pekerjaan (Total per Kategori)**
@@ -615,9 +615,9 @@ $pdf->SetX($ttdX);
 $pdf->SetFont('helvetica', 'BU', 10);
 $pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
 
-$pdf->SetX($ttdX);
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
+// $pdf->SetX($ttdX);
+// $pdf->SetFont('helvetica', '', 9);
+// $pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
 
 
 // Output PDF
