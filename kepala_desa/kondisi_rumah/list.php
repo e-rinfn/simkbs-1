@@ -459,10 +459,10 @@ foreach ($data_rumah as $rumah) {
                         </div>
                         <div class="btn-group">
                             <?php if ($total_data > 0): ?>
-                                <a href="export_excel_simple.php?<?= http_build_query($_GET) ?>" class="btn btn-excel">
+                                <a href="export_excel_simple.php?<?= http_build_query($_GET) ?>" class="btn btn-success">
                                     <i class="ti ti-file-spreadsheet"></i> Excel
                                 </a>
-                                <a href="export_pdf_rumah.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-pdf">
+                                <a href="export_pdf_rumah.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-danger">
                                     <i class="ti ti-file-text"></i> PDF
                                 </a>
                             <?php endif; ?>

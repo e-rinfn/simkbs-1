@@ -154,7 +154,7 @@ if (file_exists($logoPath)) {
     // Informasi desa di bawah judul
     $pdf->SetXY(40, $pdf->GetY());
     $pdf->SetFont('helvetica', '', 10);
-    $pdf->Cell(0, 5, 'Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya', 0, 1);
+    $pdf->Cell(0, 5, 'Jl. Kapten Suradimadja Dalam No. 110 Kurniabakti Kec. Ciawi Kab. Tasikmalaya', 0, 1);
 
     $pdf->SetXY(40, $pdf->GetY());
     $pdf->Cell(0, 5, 'Telp: (0265) 123456 | Email: desakurniabakti@email.com', 0, 1);
@@ -162,7 +162,7 @@ if (file_exists($logoPath)) {
     // Jika logo tidak ada, tampilkan header biasa
     $pdf->Cell(0, 10, 'LAPORAN DATA KEPENDUDUKAN', 0, 1, 'C');
     $pdf->SetFont('helvetica', '', 10);
-    $pdf->Cell(0, 5, 'Desa Kurniabakti, Kecamatan Cineam, Kabupaten Tasikmalaya', 0, 1, 'C');
+    $pdf->Cell(0, 5, 'Jl. Kapten Suradimadja Dalam No. 110 Kurniabakti Kec. Ciawi Kab. Tasikmalaya', 0, 1, 'C');
     $pdf->Cell(0, 5, 'Telp: (0265) 123456 | Email: desakurniabakti@email.com', 0, 1, 'C');
 }
 
@@ -333,9 +333,9 @@ $pdf->SetX($ttdX);
 $pdf->SetFont('helvetica', 'BU', 10);
 $pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
 
-$pdf->SetX($ttdX);
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
+// $pdf->SetX($ttdX);
+// $pdf->SetFont('helvetica', '', 9);
+// $pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
 
 // Informasi laporan di bagian bawah
 $pdf->Ln(10);
