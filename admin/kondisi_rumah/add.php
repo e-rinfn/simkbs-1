@@ -21,6 +21,7 @@ $fasilitas_mck_options = ['JAMBAN SENDIRI', 'JAMBAN BERSAMA', 'TIDAK ADA'];
 $sumber_penerangan_options = ['PLN', 'GENSET', 'LAMPU MINYAK', 'TIDAK ADA'];
 $sumber_air_minum_options = ['PDAM', 'SUMUR BOR', 'MATA AIR', 'AIR KEMASAN', 'LAINNYA'];
 $bahan_bakar_options = ['GAS', 'KAYU BAKAR', 'LISTRIK', 'MINYAK TANAH', 'LAINNYA'];
+$kondisi_rumah_options = ['LAYAK HUNI', 'RUSAK RINGAN', 'RUSAK BERAT'];
 
 $error = '';
 $success = '';
@@ -36,7 +37,8 @@ $form_data = [
     'fasilitas_mck' => 'JAMBAN SENDIRI',
     'sumber_penerangan' => 'PLN',
     'sumber_air_minum' => 'SUMUR BOR',
-    'bahan_bakar' => 'GAS'
+    'bahan_bakar' => 'GAS',
+    'kondisi_rumah' => 'LAYAK HUNI'
 ];
 
 // Data penduduk untuk autocomplete
@@ -88,6 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sumber_penerangan = $conn->real_escape_string($_POST['sumber_penerangan']);
         $sumber_air_minum = $conn->real_escape_string($_POST['sumber_air_minum']);
         $bahan_bakar = $conn->real_escape_string($_POST['bahan_bakar']);
+        $kondisi_rumah = $conn->real_escape_string($_POST['kondisi_rumah']);
 
         // Validasi data wajib
         if (empty($no_kk)) {
@@ -142,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ) VALUES (
             '$nik', '$no_kk', '$nama_lgkp', '$luas_lantai', '$jenis_lantai', '$jenis_dinding',
             '$fasilitas_mck', '$sumber_penerangan', '$sumber_air_minum', '$bahan_bakar',
-            'MILIK SENDIRI', 'LAYAK HUNI'
+            'MILIK SENDIRI', '$kondisi_rumah'
         )";
 
         if (!$conn->query($sql_rumah)) {
@@ -166,7 +169,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'fasilitas_mck' => $_POST['fasilitas_mck'] ?? 'JAMBAN SENDIRI',
             'sumber_penerangan' => $_POST['sumber_penerangan'] ?? 'PLN',
             'sumber_air_minum' => $_POST['sumber_air_minum'] ?? 'SUMUR BOR',
-            'bahan_bakar' => $_POST['bahan_bakar'] ?? 'GAS'
+            'bahan_bakar' => $_POST['bahan_bakar'] ?? 'GAS',
+            'kondisi_rumah' => $_POST['kondisi_rumah'] ?? 'LAYAK HUNI'
         ];
     }
 }
@@ -428,6 +432,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <?php foreach ($bahan_bakar_options as $bahan): ?>
                                             <option value="<?= $bahan ?>" <?= $form_data['bahan_bakar'] == $bahan ? 'selected' : '' ?>>
                                                 <?= $bahan ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="kondisi_rumah" class="form-label">Kondisi Rumah</label>
+                                    <select id="kondisi_rumah" name="kondisi_rumah" class="form-select" required>
+                                        <option value="">Pilih Kondisi Rumah</option>
+                                        <?php foreach ($kondisi_rumah_options as $kondisi): ?>
+                                            <option value="<?= $kondisi ?>" <?= $form_data['kondisi_rumah'] == $kondisi ? 'selected' : '' ?>>
+                                                <?= $kondisi ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>

@@ -212,8 +212,8 @@ if (isset($_POST['login'])) {
               <label class="form-label">Password</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="ti ti-lock"></i></span>
-                <input type="password" class="form-control" name="password" placeholder="********" required>
-                <span class="input-group-text" style="cursor:pointer">
+                <input type="password" class="form-control" id="password" name="password" placeholder="********" required>
+                <span class="input-group-text" id="togglePassword" style="cursor:pointer">
                   <i class="ti ti-eye-off"></i>
                 </span>
               </div>
@@ -239,18 +239,24 @@ if (isset($_POST['login'])) {
     // Toggle password visibility
     const togglePassword = document.querySelector('#togglePassword');
     const password = document.querySelector('#password');
-    const icon = togglePassword.querySelector('i');
 
-    togglePassword.addEventListener('click', () => {
-      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-      password.setAttribute('type', type);
-      icon.classList.toggle('ti-eye');
-      icon.classList.toggle('ti-eye-off');
-    });
+    if (togglePassword && password) {
+      const icon = togglePassword.querySelector('i');
+
+      togglePassword.addEventListener('click', () => {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        icon.classList.toggle('ti-eye');
+        icon.classList.toggle('ti-eye-off');
+      });
+    }
 
     // Fokus ke input username saat halaman dimuat
     document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('username').focus();
+      const usernameField = document.querySelector('input[name="username"]');
+      if (usernameField) {
+        usernameField.focus();
+      }
     });
   </script>
 

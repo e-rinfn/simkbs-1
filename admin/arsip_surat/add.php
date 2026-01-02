@@ -125,9 +125,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Ukuran file terlalu besar. Maksimal 5MB.");
             }
 
-            // Generate unique filename
-            $new_file_name = time() . '_' . uniqid() . '.' . $file_ext;
+            // Generate filename dengan format: nomor_surat_nama_asli
+            // Sanitasi nomor surat (hapus karakter khusus)
+            $sanitized_number = preg_replace('/[^a-zA-Z0-9]/', '', $nomor_surat);
+            // Sanitasi nama file asli (hapus karakter khusus kecuali - dan _)
+            $original_name = pathinfo($file_name, PATHINFO_FILENAME);
+            $sanitized_name = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $original_name);
+            // Format: nomor_surat_nama_asli.ext
+            $new_file_name = $sanitized_number . '_' . $sanitized_name . '.' . $file_ext;
             $file_path = $upload_dir . $new_file_name;
+
+            // Jika file dengan nama yang sama sudah ada, tambahkan timestamp
+            $counter = 1;
+            while (file_exists($file_path)) {
+                $new_file_name = $sanitized_number . '_' . $sanitized_name . '_' . $counter . '.' . $file_ext;
+                $file_path = $upload_dir . $new_file_name;
+                $counter++;
+            }
 
             // // Upload file
             // if (!move_uploaded_file($file_tmp, $file_path)) {

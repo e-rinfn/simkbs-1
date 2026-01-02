@@ -21,6 +21,7 @@ $fasilitas_mck_options = ['JAMBAN SENDIRI', 'JAMBAN BERSAMA', 'TIDAK ADA'];
 $sumber_penerangan_options = ['PLN', 'GENSET', 'LAMPU MINYAK', 'TIDAK ADA'];
 $sumber_air_minum_options = ['PDAM', 'SUMUR BOR', 'MATA AIR', 'AIR KEMASAN', 'LAINNYA'];
 $bahan_bakar_options = ['GAS', 'KAYU BAKAR', 'LISTRIK', 'MINYAK TANAH', 'LAINNYA'];
+$kondisi_rumah_options = ['LAYAK HUNI', 'RUSAK RINGAN', 'RUSAK BERAT'];
 
 $error = '';
 $success = '';
@@ -36,7 +37,8 @@ $form_data = [
     'fasilitas_mck' => '',
     'sumber_penerangan' => '',
     'sumber_air_minum' => '',
-    'bahan_bakar' => ''
+    'bahan_bakar' => '',
+    'kondisi_rumah' => ''
 ];
 
 // Cek apakah ada parameter id (NIK) yang dikirim
@@ -80,7 +82,8 @@ $form_data = [
     'fasilitas_mck' => $data_rumah['fasilitas_bab'],
     'sumber_penerangan' => $data_rumah['sumber_penerangan'],
     'sumber_air_minum' => $data_rumah['sumber_air_minum'],
-    'bahan_bakar' => $data_rumah['bahan_bakar_memasak']
+    'bahan_bakar' => $data_rumah['bahan_bakar_memasak'],
+    'kondisi_rumah' => $data_rumah['kondisi_rumah']
 ];
 
 // Data penduduk untuk info
@@ -104,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sumber_penerangan = $conn->real_escape_string($_POST['sumber_penerangan']);
         $sumber_air_minum = $conn->real_escape_string($_POST['sumber_air_minum']);
         $bahan_bakar = $conn->real_escape_string($_POST['bahan_bakar']);
+        $kondisi_rumah = $conn->real_escape_string($_POST['kondisi_rumah']);
 
         // Validasi data wajib
         if (empty($no_kk)) {
@@ -155,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sumber_penerangan = '$sumber_penerangan',
             sumber_air_minum = '$sumber_air_minum',
             bahan_bakar_memasak = '$bahan_bakar',
+            kondisi_rumah = '$kondisi_rumah',
             updated_at = NOW()
         WHERE NIK = '$nik_edit'";
 
@@ -179,7 +184,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'fasilitas_mck' => $_POST['fasilitas_mck'] ?? '',
             'sumber_penerangan' => $_POST['sumber_penerangan'] ?? '',
             'sumber_air_minum' => $_POST['sumber_air_minum'] ?? '',
-            'bahan_bakar' => $_POST['bahan_bakar'] ?? ''
+            'bahan_bakar' => $_POST['bahan_bakar'] ?? '',
+            'kondisi_rumah' => $_POST['kondisi_rumah'] ?? ''
         ];
     }
 }
@@ -429,6 +435,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <?php foreach ($bahan_bakar_options as $bahan): ?>
                                             <option value="<?= $bahan ?>" <?= $form_data['bahan_bakar'] == $bahan ? 'selected' : '' ?>>
                                                 <?= $bahan ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="kondisi_rumah" class="form-label">Kondisi Rumah</label>
+                                    <select id="kondisi_rumah" name="kondisi_rumah" class="form-select" required>
+                                        <option value="">Pilih Kondisi Rumah</option>
+                                        <?php foreach ($kondisi_rumah_options as $kondisi): ?>
+                                            <option value="<?= $kondisi ?>" <?= $form_data['kondisi_rumah'] == $kondisi ? 'selected' : '' ?>>
+                                                <?= $kondisi ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>

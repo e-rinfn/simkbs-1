@@ -674,13 +674,14 @@ $stat_perempuan = query("SELECT COUNT(*) as total FROM tabel_kependudukan WHERE 
                                                         <?php endif; ?>
                                                     </td>
                                                     <td>
-                                                        <span class="badge badge-jk-<?= $row['JK'] ?>">
+                                                        <span class="badge bg-warning text-dark">
                                                             <?= $row['JK'] == 'L' ? 'Laki-laki' : 'Perempuan' ?>
                                                         </span>
-                                                        <br><small><?= $usia ?> tahun</small>
+                                                        <br>
+                                                        <small><?= $usia ?> tahun</small>
                                                     </td>
                                                     <td>
-                                                        <?= date('d/m/Y', strtotime($row['TGL_LHR'])) ?><br>
+                                                        <?= dateIndo($row['TGL_LHR']) ?><br>
                                                         <small><?= htmlspecialchars($row['TMPT_LHR']) ?></small>
                                                     </td>
                                                     <td>
@@ -692,18 +693,24 @@ $stat_perempuan = query("SELECT COUNT(*) as total FROM tabel_kependudukan WHERE 
                                                         </small>
                                                     </td>
                                                     <td>
-                                                        <span class="badge bg-primary mb-1">
-                                                            <?= $row['STATUS_KAWIN'] ?>
+                                                        <!-- Status Kawin -->
+                                                        <span class="badge bg-primary mb-1 d-inline-block">
+                                                            <?= htmlspecialchars($row['STATUS_KAWIN']) ?>
                                                         </span>
                                                         <br>
-                                                        <span class="badge bg-info mb-1">
-                                                            <?= $row['AGAMA'] ?>
+
+                                                        <!-- Agama -->
+                                                        <span class="badge bg-info mb-1 d-inline-block">
+                                                            <?= htmlspecialchars($row['AGAMA']) ?>
                                                         </span>
                                                         <br>
-                                                        <span class="badge badge-disabilitas-<?= $row['DISABILITAS'] ?>">
-                                                            Disabilitas: <?= $row['DISABILITAS'] ?>
+
+                                                        <!-- Disabilitas -->
+                                                        <span class="badge <?= $row['DISABILITAS'] === 'Ya' ? 'bg-warning text-dark' : 'bg-success' ?>">
+                                                            Disabilitas: <?= htmlspecialchars($row['DISABILITAS']) ?>
                                                         </span>
                                                     </td>
+
                                                     <td class="action-buttons">
                                                         <a href="detail.php?id=<?= $row['id'] ?>"
                                                             class="btn btn-sm btn-info"
