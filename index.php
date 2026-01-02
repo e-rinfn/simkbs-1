@@ -794,7 +794,13 @@ $pendidikan_icons = [
                         <a class="nav-link" href="#kontak">Kontak</a>
                     </li>
                     <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
-                        <a href="<?php echo isset($_SESSION['user_id']) ? 'admin/dashboard.php' : 'auth/login.php'; ?>" class="btn btn-login">
+                        <a href="<?php
+                                    if (isset($_SESSION['user_id'])) {
+                                        echo ($_SESSION['role'] === 'kepala_desa') ? 'kepala_desa/index.php' : 'admin/index.php';
+                                    } else {
+                                        echo 'auth/login.php';
+                                    }
+                                    ?>" class="btn btn-login">
                             <?php echo isset($_SESSION['user_id']) ? 'Dashboard' : 'Login'; ?>
                         </a>
                     </li>
