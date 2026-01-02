@@ -8,13 +8,10 @@ if (!isLoggedIn()) {
     exit;
 }
 
-// Cek role user
-$allowed_roles = ['admin', 'kades', 'sekretaris'];
-if (!in_array($_SESSION['role'], $allowed_roles)) {
-    header("Location: {$base_url}auth/role_tidak_cocok.php");
+if ($_SESSION['role'] !== 'kepala_desa') {
+    header("Location: {$base_url}/auth/role_tidak_cocok.php");
     exit();
 }
-
 // Cek apakah ada parameter ID
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     $_SESSION['error'] = 'ID surat tidak valid!';

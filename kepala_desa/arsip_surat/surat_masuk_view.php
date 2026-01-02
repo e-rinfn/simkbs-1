@@ -8,10 +8,8 @@ if (!isLoggedIn()) {
     exit;
 }
 
-// Cek role user
-$allowed_roles = ['admin', 'kades', 'sekretaris'];
-if (!in_array($_SESSION['role'], $allowed_roles)) {
-    header("Location: {$base_url}auth/role_tidak_cocok.php");
+if ($_SESSION['role'] !== 'kepala_desa') {
+    header("Location: {$base_url}/auth/role_tidak_cocok.php");
     exit();
 }
 
