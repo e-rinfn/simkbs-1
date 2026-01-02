@@ -15,12 +15,12 @@ if ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'kades') {
 }
 
 // Data untuk dropdown
-$jenis_lantai_options = ['SEMEN', 'KERAMIK', 'MARMER', 'PARQUET', 'UBIN/TEGEL', 'TANAH', 'BAMBU', 'KAYU', 'LAINNYA'];
-$jenis_dinding_options = ['TEMBOK', 'PAPAN', 'BAMBU', 'KAYU', 'ANYAMAN', 'LAINNYA'];
-$fasilitas_mck_options = ['JAMBAN SENDIRI', 'JAMBAN BERSAMA', 'JAMBAN UMUM', 'TIDAK ADA'];
-$sumber_penerangan_options = ['PLN', 'GENSET', 'SOLAR CELL', 'LAMPU MINYAK', 'TIDAK ADA'];
-$sumber_air_minum_options = ['PDAM', 'SUMUR BOR', 'SUMUR GALI', 'MATA AIR', 'AIR HUJAN', 'AIR KEMASAN', 'LAINNYA'];
-$bahan_bakar_options = ['GAS', 'KAYU BAKAR', 'MINYAK TANAH', 'BRIKET', 'LISTRIK', 'LAINNYA'];
+$jenis_lantai_options = ['KERAMIK', 'SEMEN', 'TANAH', 'KAYU', 'LAINNYA'];
+$jenis_dinding_options = ['TEMBOK', 'KAYU', 'BAMBU', 'LAINNYA'];
+$fasilitas_mck_options = ['JAMBAN SENDIRI', 'JAMBAN BERSAMA', 'TIDAK ADA'];
+$sumber_penerangan_options = ['PLN', 'GENSET', 'LAMPU MINYAK', 'TIDAK ADA'];
+$sumber_air_minum_options = ['PDAM', 'SUMUR BOR', 'MATA AIR', 'AIR KEMASAN', 'LAINNYA'];
+$bahan_bakar_options = ['GAS', 'KAYU BAKAR', 'LISTRIK', 'MINYAK TANAH', 'LAINNYA'];
 
 $error = '';
 $success = '';
