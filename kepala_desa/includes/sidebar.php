@@ -89,12 +89,6 @@ function isActive($path)
                     </a>
                 </li>
 
-                <li class="pc-item <?= isActive('/control_panel') ?>">
-                    <a href="<?= $base_url ?>/kepala_desa/control_panel/list.php" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-settings"></i></span>
-                        <span class="pc-mtext">Kontrol Panel</span>
-                    </a>
-                </li>
             </ul>
         </div>
     </div>
