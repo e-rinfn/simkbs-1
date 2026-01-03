@@ -673,11 +673,11 @@ $base_url_path_surat = $base_url . '/uploads/surat/';
                         <!-- Header Surat Masuk -->
                         <div class="tab-header">
                             <h3 class="tab-title">Arsip Surat Masuk</h3>
-                            <div class="tab-actions">
+                            <!-- <div class="tab-actions">
                                 <a href="add.php" class="btn btn-success">
                                     <i class="ti ti-plus"></i> Tambah Surat Masuk
                                 </a>
-                            </div>
+                            </div> -->
                         </div>
 
                         <!-- Filter Surat Masuk -->

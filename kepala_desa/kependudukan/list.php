@@ -191,11 +191,11 @@ $stat_perempuan = query("SELECT COUNT(*) as total FROM tabel_kependudukan WHERE 
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2>Data Kependudukan</h2>
-                    <div>
+                    <!-- <div>
                         <a href="add.php" class="btn btn-success">
                             <i class="ti ti-user-plus"></i> Tambah Penduduk
                         </a>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Filter Section -->
