@@ -293,7 +293,7 @@ foreach ($data as $row) {
             $pdf->Cell($col_widths[$i], 7, $header, 1, 0, 'C', 1);
         }
         $pdf->Ln();
-        $pdf->SetFont('helvetica', '', 8);
+        $pdf->SetFont('times', '', 8);
     }
 
     // Hitung usia
@@ -377,26 +377,26 @@ $ttdX = $pageWidth - 80; // 80mm dari kiri untuk TTD
 $pdf->SetX($ttdX);
 
 // TTD di sebelah kanan
-$pdf->SetFont('helvetica', '', 9);
+$pdf->SetFont('times', '', 9);
 $pdf->Cell(70, 5, 'Mengetahui,', 0, 1, 'C');
 $pdf->SetX($ttdX);
 $pdf->Cell(70, 15, '', 0, 1, 'C'); // Space untuk tanda tangan
 
 $pdf->SetX($ttdX);
-$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetFont('times', 'B', 10);
 $pdf->Cell(70, 5, 'KEPALA DESA KURNIABAKTI', 0, 1, 'C');
 
 $pdf->SetX($ttdX);
-$pdf->SetFont('helvetica', 'BU', 10);
+$pdf->SetFont('times', 'BU', 10);
 $pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
 
 // $pdf->SetX($ttdX);
-// $pdf->SetFont('helvetica', '', 9);
+// $pdf->SetFont('times', '', 9);
 // $pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
 
 // Informasi laporan di bagian bawah
 $pdf->Ln(10);
-$pdf->SetFont('helvetica', 'I', 8);
+$pdf->SetFont('times', 'I', 8);
 $pdf->Cell(0, 5, '--- Laporan ini dicetak secara otomatis dari Sistem Administrasi Desa Kurniabakti ---', 0, 1, 'C');
 $pdf->Cell(0, 5, 'Halaman ' . $pdf->PageNo(), 0, 1, 'C');
 
