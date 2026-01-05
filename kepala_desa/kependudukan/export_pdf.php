@@ -137,42 +137,99 @@ function truncateStatusKawin($text)
 }
 
 // Header dengan Logo
-$pdf->SetFont('helvetica', 'B', 16);
+$pdf->SetFont('times', 'B', 16);
 
-// Path logo (sesuaikan dengan lokasi logo Anda)
+// Path logo
 $logoPath = __DIR__ . '/../../assets/img/LogoKBS.png';
 
-// Cek apakah logo ada
+// Posisi awal
+$marginLeft = 10;
+$logoWidth  = 25;
+$textStartX = $marginLeft + $logoWidth + 2; // jarak setelah logo, sedikit digeser kiri
+$pageWidth  = $pdf->getPageWidth();
+$textWidth  = $pageWidth - $textStartX - $marginLeft;
+
 if (file_exists($logoPath)) {
-    // Tambahkan logo di kiri atas
-    $pdf->Image($logoPath, 10, 10, 25, 0, '', '', '', false, 300, '', false, false, 0);
 
-    // Pindahkan posisi untuk judul di kanan logo
-    $pdf->SetXY(40, 10);
-    $pdf->Cell(0, 10, 'LAPORAN DATA KEPENDUDUKAN', 0, 1);
+    // Logo kiri
+    $pdf->Image($logoPath, $marginLeft, 10, $logoWidth);
 
-    // Informasi desa di bawah judul
-    $pdf->SetXY(40, $pdf->GetY());
-    $pdf->SetFont('helvetica', '', 10);
-    $pdf->Cell(0, 5, 'Jl. Kapten Suradimadja Dalam No. 110 Kurniabakti Kec. Ciawi Kab. Tasikmalaya', 0, 1);
+    // Header teks manual (tanpa align 'C')
+    $y = 10;
 
-    $pdf->SetXY(40, $pdf->GetY());
-    $pdf->Cell(0, 5, 'Telp: (0265) 123456 | Email: desakurniabakti@email.com', 0, 1);
+    $pdf->SetFont('times', 'B', 12);
+    $text = 'PEMERINTAH DAERAH KABUPATEN TASIKMALAYA';
+    $w = $pdf->GetStringWidth($text);
+    $x = max($textStartX, ($pageWidth - $w) / 2);
+    $pdf->SetXY($x, $y);
+    $pdf->Cell($w, 6, $text, 0, 1, 'L');
+
+    $pdf->SetFont('times', 'B', 11);
+    $text = 'KECAMATAN CIAWI';
+    $w = $pdf->GetStringWidth($text);
+    $x = max($textStartX, ($pageWidth - $w) / 2);
+    $pdf->SetXY($x, $y + 6);
+    $pdf->Cell($w, 5, $text, 0, 1, 'L');
+
+    $pdf->SetFont('times', 'B', 14);
+    $text = 'DESA KURNIABAKTI';
+    $w = $pdf->GetStringWidth($text);
+    $x = max($textStartX, ($pageWidth - $w) / 2);
+    $pdf->SetXY($x, $y + 11);
+    $pdf->Cell($w, 6, $text, 0, 1, 'L');
+
+    $pdf->SetFont('times', '', 9);
+    $text = 'Jl. Kapten Suradimadja Dalam No. 110 Kode Pos 46156 Ciawi TASIKMALAYA';
+    $w = $pdf->GetStringWidth($text);
+    $x = max($textStartX, ($pageWidth - $w) / 2);
+    $pdf->SetXY($x, $y + 20);
+    $pdf->Cell($w, 5, $text, 0, 1, 'L');
 } else {
-    // Jika logo tidak ada, tampilkan header biasa
-    $pdf->Cell(0, 10, 'LAPORAN DATA KEPENDUDUKAN', 0, 1, 'C');
-    $pdf->SetFont('helvetica', '', 10);
-    $pdf->Cell(0, 5, 'Jl. Kapten Suradimadja Dalam No. 110 Kurniabakti Kec. Ciawi Kab. Tasikmalaya', 0, 1, 'C');
-    $pdf->Cell(0, 5, 'Telp: (0265) 123456 | Email: desakurniabakti@email.com', 0, 1, 'C');
+
+    // Jika logo tidak ada → full center halaman (manual X)
+    $y = 10;
+
+    $pdf->SetFont('times', 'B', 12);
+    $text = 'PEMERINTAH DAERAH KABUPATEN TASIKMALAYA';
+    $w = $pdf->GetStringWidth($text);
+    $x = ($pageWidth - $w) / 2;
+    $pdf->SetXY($x, $y);
+    $pdf->Cell($w, 6, $text, 0, 1, 'L');
+
+    $pdf->SetFont('times', 'B', 11);
+    $text = 'KECAMATAN CIAWI';
+    $w = $pdf->GetStringWidth($text);
+    $x = ($pageWidth - $w) / 2;
+    $pdf->SetXY($x, $y + 6);
+    $pdf->Cell($w, 5, $text, 0, 1, 'L');
+
+    $pdf->SetFont('times', 'B', 14);
+    $text = 'DESA KURNIABAKTI';
+    $w = $pdf->GetStringWidth($text);
+    $x = ($pageWidth - $w) / 2;
+    $pdf->SetXY($x, $y + 11);
+    $pdf->Cell($w, 6, $text, 0, 1, 'L');
+
+    $pdf->SetFont('times', '', 9);
+    $text = 'Jl. Kapten Suradimadja Dalam No. 110 Kode Pos 46156 Ciawi TASIKMALAYA';
+    $w = $pdf->GetStringWidth($text);
+    $x = ($pageWidth - $w) / 2;
+    $pdf->SetXY($x, $y + 17);
+    $pdf->Cell($w, 5, $text, 0, 1, 'L');
 }
 
-// Garis pemisah
-$y = $pdf->GetY() + 7; // atur angka sesuai kebutuhan
+// Garis pemisah (dua garis tipis)
+$y = $pdf->GetY() + 2; // atur angka sesuai kebutuhan
 $pdf->Line(10, $y, $pdf->GetPageWidth() - 10, $y);
+$pdf->Line(10, $y + 1.2, $pdf->GetPageWidth() - 10, $y + 1.2);
 $pdf->Ln(8);
 
+// Judul Laporan
+$pdf->SetFont('times', 'B', 14);
+$pdf->Cell(0, 10, 'LAPORAN DATA KEPENDUDUKAN', 0, 1, 'C');
+
 // Informasi filter
-$pdf->SetFont('helvetica', '', 9);
+$pdf->SetFont('times', '', 9);
 $filter_info = [];
 
 if (!empty($search)) {
@@ -196,7 +253,7 @@ $pdf->Ln(3);
 
 // Tabel header - SEDERHANA TANPA MULTICELL
 $pdf->SetFillColor(240, 240, 240);
-$pdf->SetFont('helvetica', 'B', 9);
+$pdf->SetFont('times', 'B', 9);
 
 // Set column widths yang lebih sederhana
 $col_widths = array(8, 28, 28, 40, 10, 10, 30, 20, 18, 45, 40);
@@ -222,7 +279,7 @@ foreach ($headers as $i => $header) {
 $pdf->Ln();
 
 // Data rows - VERSI SEDERHANA
-$pdf->SetFont('helvetica', '', 8);
+$pdf->SetFont('times', '', 8);
 $no = 1;
 
 foreach ($data as $row) {
@@ -230,12 +287,12 @@ foreach ($data as $row) {
     if ($pdf->GetY() > 180) {
         $pdf->AddPage();
         // Print header lagi di halaman baru
-        $pdf->SetFont('helvetica', 'B', 9);
+        $pdf->SetFont('times', 'B', 9);
         foreach ($headers as $i => $header) {
             $pdf->Cell($col_widths[$i], 7, $header, 1, 0, 'C', 1);
         }
         $pdf->Ln();
-        $pdf->SetFont('helvetica', '', 8);
+        $pdf->SetFont('times', '', 8);
     }
 
     // Hitung usia
@@ -319,26 +376,26 @@ $ttdX = $pageWidth - 80; // 80mm dari kiri untuk TTD
 $pdf->SetX($ttdX);
 
 // TTD di sebelah kanan
-$pdf->SetFont('helvetica', '', 9);
+$pdf->SetFont('times', '', 9);
 $pdf->Cell(70, 5, 'Mengetahui,', 0, 1, 'C');
 $pdf->SetX($ttdX);
 $pdf->Cell(70, 15, '', 0, 1, 'C'); // Space untuk tanda tangan
 
 $pdf->SetX($ttdX);
-$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetFont('times', 'B', 10);
 $pdf->Cell(70, 5, 'KEPALA DESA KURNIABAKTI', 0, 1, 'C');
 
 $pdf->SetX($ttdX);
-$pdf->SetFont('helvetica', 'BU', 10);
+$pdf->SetFont('times', 'BU', 10);
 $pdf->Cell(70, 5, 'NAMA KEPALA DESA', 0, 1, 'C');
 
 // $pdf->SetX($ttdX);
-// $pdf->SetFont('helvetica', '', 9);
+// $pdf->SetFont('times', '', 9);
 // $pdf->Cell(70, 5, 'NIP. 1234567890123456', 0, 1, 'C');
 
 // Informasi laporan di bagian bawah
 $pdf->Ln(10);
-$pdf->SetFont('helvetica', 'I', 8);
+$pdf->SetFont('times', 'I', 8);
 $pdf->Cell(0, 5, '--- Laporan ini dicetak secara otomatis dari Sistem Administrasi Desa Kurniabakti ---', 0, 1, 'C');
 $pdf->Cell(0, 5, 'Halaman ' . $pdf->PageNo(), 0, 1, 'C');
 
