@@ -180,7 +180,7 @@ $pdf->Ln(8);
 
 // Judul Laporan
 $pdf->SetFont('times', 'B', 14);
-$pdf->Cell(0, 10, 'LAPORAN DATA KEPENDUDUKAN', 0, 1, 'C');
+$pdf->Cell(0, 10, 'LAPORAN DATA KONDISI RUMAH', 0, 1, 'C');
 
 // Informasi filter
 $filter_info = [];
