@@ -711,7 +711,10 @@ function formatUkuranFile($bytes)
                                                             <div class="col-md-6 col-lg-4">
                                                                 <div class="dokumen-card">
                                                                     <div class="dokumen-header">
-                                                                        <span class="dokumen-badge">Buku Nikah</span>
+                                                                        <div>
+                                                                            <span class="dokumen-badge">Buku Nikah</span>
+                                                                            <h6 class="mt-2 mb-0"><?= htmlspecialchars($dokumen['original_name']) ?></h6>
+                                                                        </div>
                                                                         <small class="text-muted">
                                                                             <?= formatTanggalIndo($dokumen['tanggal_dokumen']) ?>
                                                                         </small>
@@ -767,7 +770,10 @@ function formatUkuranFile($bytes)
                                                             <div class="col-md-6 col-lg-4">
                                                                 <div class="dokumen-card">
                                                                     <div class="dokumen-header">
-                                                                        <span class="dokumen-badge">Akta Kematian</span>
+                                                                        <div>
+                                                                            <span class="dokumen-badge">Akta Kematian</span>
+                                                                            <h6 class="mt-2 mb-0"><?= htmlspecialchars($dokumen['original_name']) ?></h6>
+                                                                        </div>
                                                                         <small class="text-muted">
                                                                             <?= formatTanggalIndo($dokumen['tanggal_dokumen']) ?>
                                                                         </small>
@@ -818,7 +824,10 @@ function formatUkuranFile($bytes)
                                                             <div class="col-md-6 col-lg-4">
                                                                 <div class="dokumen-card">
                                                                     <div class="dokumen-header">
-                                                                        <span class="dokumen-badge">Akta Pindah</span>
+                                                                        <div>
+                                                                            <span class="dokumen-badge">Akta Pindah</span>
+                                                                            <h6 class="mt-2 mb-0"><?= htmlspecialchars($dokumen['original_name']) ?></h6>
+                                                                        </div>
                                                                         <small class="text-muted">
                                                                             <?= formatTanggalIndo($dokumen['tanggal_dokumen']) ?>
                                                                         </small>
@@ -867,7 +876,10 @@ function formatUkuranFile($bytes)
                                                         <div class="col-md-6 col-lg-4">
                                                             <div class="dokumen-card">
                                                                 <div class="dokumen-header">
-                                                                    <span class="dokumen-badge">Lainnya</span>
+                                                                    <div>
+                                                                        <span class="dokumen-badge">Lainnya</span>
+                                                                        <h6 class="mt-2 mb-0"><?= htmlspecialchars($dokumen['original_name']) ?></h6>
+                                                                    </div>
                                                                     <small class="text-muted">
                                                                         <?= formatTanggalWaktu($dokumen['created_at']) ?>
                                                                     </small>
@@ -902,23 +914,6 @@ function formatUkuranFile($bytes)
                                             <?php endif; ?>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Tombol Aksi -->
-                            <div class="d-flex justify-content-between mt-4">
-                                <div>
-                                    <a href="list.php" class="btn btn-secondary">
-                                        <i class="ti ti-arrow-left"></i> Kembali ke Daftar
-                                    </a>
-                                </div>
-                                <div>
-                                    <a href="edit.php?id=<?= $id ?>" class="btn btn-primary">
-                                        <i class="ti ti-edit"></i> Edit Data
-                                    </a>
-                                    <a href="print_detail.php?id=<?= $id ?>" target="_blank" class="btn btn-info">
-                                        <i class="ti ti-printer"></i> Cetak
-                                    </a>
                                 </div>
                             </div>
                         </div>
