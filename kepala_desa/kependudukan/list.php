@@ -458,16 +458,27 @@ $stat_perempuan = query("SELECT COUNT(*) as total FROM tabel_kependudukan WHERE 
                                                         </small>
                                                     </td>
                                                     <td>
-                                                        <span class="badge bg-primary mb-1">
-                                                            <?= $row['STATUS_KAWIN'] ?>
+                                                        <!-- Status Tinggal -->
+                                                        <span class="badge bg-secondary mb-1 d-inline-block">
+                                                            <?= htmlspecialchars($row['STATUS_TINGGAL']) ?>
                                                         </span>
                                                         <br>
-                                                        <span class="badge bg-info mb-1">
-                                                            <?= $row['AGAMA'] ?>
+
+                                                        <!-- Status Kawin -->
+                                                        <span class="badge bg-primary mb-1 d-inline-block">
+                                                            <?= htmlspecialchars($row['STATUS_KAWIN']) ?>
                                                         </span>
                                                         <br>
-                                                        <span class="badge badge-disabilitas-<?= $row['DISABILITAS'] ?>">
-                                                            Disabilitas: <?= $row['DISABILITAS'] ?>
+
+                                                        <!-- Agama -->
+                                                        <span class="badge bg-info mb-1 d-inline-block">
+                                                            <?= htmlspecialchars($row['AGAMA']) ?>
+                                                        </span>
+                                                        <br>
+
+                                                        <!-- Disabilitas -->
+                                                        <span class="badge <?= $row['DISABILITAS'] === 'Ya' ? 'bg-warning text-dark' : 'bg-success' ?>">
+                                                            Disabilitas: <?= htmlspecialchars($row['DISABILITAS']) ?>
                                                         </span>
                                                     </td>
                                                     <td class="action-buttons">

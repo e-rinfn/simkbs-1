@@ -693,6 +693,12 @@ $stat_perempuan = query("SELECT COUNT(*) as total FROM tabel_kependudukan WHERE 
                                                         </small>
                                                     </td>
                                                     <td>
+                                                        <!-- Status Tinggal -->
+                                                        <span class="badge bg-secondary mb-1 d-inline-block">
+                                                            <?= htmlspecialchars($row['STATUS_TINGGAL']) ?>
+                                                        </span>
+                                                        <br>
+
                                                         <!-- Status Kawin -->
                                                         <span class="badge bg-primary mb-1 d-inline-block">
                                                             <?= htmlspecialchars($row['STATUS_KAWIN']) ?>

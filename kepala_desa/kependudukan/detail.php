@@ -39,6 +39,24 @@ if (!$data) {
     exit();
 }
 
+// Ambil dokumen yang sudah diupload
+$sql_dokumen = "SELECT * FROM tabel_dokumen_penduduk WHERE penduduk_id = $id ORDER BY jenis_dokumen, created_at DESC";
+$dokumen_list = query($sql_dokumen);
+
+// Kelompokkan dokumen berdasarkan jenis
+$dokumen_grup = [];
+foreach ($dokumen_list as $dokumen) {
+    $dokumen_grup[$dokumen['jenis_dokumen']][] = $dokumen;
+}
+
+// Mapping jenis dokumen ke label
+$jenis_dokumen_labels = [
+    'AKTA_KEMATIAN' => 'Akta Kematian',
+    'AKTA_PINDAH' => 'Akta Pindah',
+    'BUKU_NIKAH' => 'Buku Nikah',
+    'LAINNYA' => 'Dokumen Lainnya'
+];
+
 // Hitung usia
 $tgl_lahir = new DateTime($data['TGL_LHR']);
 $today = new DateTime();
@@ -80,9 +98,77 @@ function formatStatusTinggalLengkap($status)
     $statuses = [
         'TETAP' => 'Tinggal Tetap',
         'SEMENTARA' => 'Tinggal Sementara',
-        'PENDATANG' => 'Pendatang'
+        'PENDATANG' => 'Pendatang',
+        'MENINGGAL' => 'Meninggal',
+        'PINDAH' => 'Pindah'
     ];
     return isset($statuses[$status]) ? $statuses[$status] : $status;
+}
+
+// Function untuk menentukan warna badge berdasarkan status tinggal
+function getStatusTinggalBadgeColor($status)
+{
+    $colors = [
+        'TETAP' => 'bg-primary',
+        'SEMENTARA' => 'bg-info',
+        'PENDATANG' => 'bg-warning',
+        'MENINGGAL' => 'bg-dark',
+        'PINDAH' => 'bg-secondary'
+    ];
+    return isset($colors[$status]) ? $colors[$status] : 'bg-secondary';
+}
+
+// Function untuk format tanggal Indonesia
+function formatTanggalIndo($date_string)
+{
+    if (empty($date_string) || $date_string == '0000-00-00') {
+        return '-';
+    }
+
+    $bulan = [
+        'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember'
+    ];
+
+    $tanggal = date('j', strtotime($date_string));
+    $bulan_idx = date('n', strtotime($date_string)) - 1;
+    $tahun = date('Y', strtotime($date_string));
+
+    return $tanggal . ' ' . $bulan[$bulan_idx] . ' ' . $tahun;
+}
+
+// Function untuk format tanggal dengan waktu
+function formatTanggalWaktu($datetime_string)
+{
+    if (empty($datetime_string) || $datetime_string == '0000-00-00 00:00:00') {
+        return '-';
+    }
+
+    return date('d-m-Y H:i', strtotime($datetime_string));
+}
+
+// Function untuk format ukuran file
+function formatUkuranFile($bytes)
+{
+    if ($bytes >= 1073741824) {
+        return number_format($bytes / 1073741824, 2) . ' GB';
+    } elseif ($bytes >= 1048576) {
+        return number_format($bytes / 1048576, 2) . ' MB';
+    } elseif ($bytes >= 1024) {
+        return number_format($bytes / 1024, 2) . ' KB';
+    } else {
+        return $bytes . ' bytes';
+    }
 }
 ?>
 
@@ -183,6 +269,94 @@ function formatStatusTinggalLengkap($status)
             background-color: #0d6efd;
             border: 2px solid white;
         }
+
+        .dokumen-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #fff;
+            transition: transform 0.2s;
+        }
+
+        .dokumen-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dokumen-card .dokumen-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .dokumen-badge {
+            background-color: #0d6efd;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+
+        .dokumen-keterangan {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .file-link {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 8px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #0d6efd;
+            font-size: 0.9em;
+        }
+
+        .file-link:hover {
+            background-color: #e9ecef;
+            color: #0a58ca;
+        }
+
+        .status-alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .status-alert.meninggal {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .status-alert.pindah {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .file-icon {
+            font-size: 1.5em;
+            margin-right: 8px;
+            color: #0d6efd;
+        }
+
+        .no-dokumen {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+
+        .no-dokumen i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #dee2e6;
+        }
     </style>
 </head>
 
@@ -214,6 +388,19 @@ function formatStatusTinggalLengkap($status)
                                 <?php unset($_SESSION['error']); ?>
                             <?php endif; ?>
 
+                            <!-- Alert untuk status khusus -->
+                            <?php if ($data['STATUS_TINGGAL'] == 'MENINGGAL'): ?>
+                                <div class="status-alert meninggal">
+                                    <h5><i class="ti ti-alert-triangle"></i> Penduduk Telah Meninggal</h5>
+                                    <p class="mb-0">Data ini memiliki status "Meninggal". Informasi selengkapnya dapat dilihat pada dokumen akta kematian di bawah.</p>
+                                </div>
+                            <?php elseif ($data['STATUS_TINGGAL'] == 'PINDAH'): ?>
+                                <div class="status-alert pindah">
+                                    <h5><i class="ti ti-user-exclamation"></i> Penduduk Telah Pindah</h5>
+                                    <p class="mb-0">Data ini memiliki status "Pindah". Informasi tentang perpindahan dapat dilihat pada dokumen akta pindah di bawah.</p>
+                                </div>
+                            <?php endif; ?>
+
                             <!-- Profile Header -->
                             <div class="profile-header text-center mb-4">
                                 <div class="profile-icon">
@@ -223,7 +410,7 @@ function formatStatusTinggalLengkap($status)
                                 <?php if ($data['NAMA_PANGGILAN']): ?>
                                     <p class="text-muted mb-2">"<?= htmlspecialchars($data['NAMA_PANGGILAN']) ?>"</p>
                                 <?php endif; ?>
-                                <div class="d-flex justify-content-center gap-2">
+                                <div class="d-flex justify-content-center gap-2 flex-wrap">
                                     <span class="badge bg-primary badge-detail">
                                         <i class="ti ti-id"></i> NIK: <?= $data['NIK'] ?>
                                     </span>
@@ -236,6 +423,10 @@ function formatStatusTinggalLengkap($status)
                                     </span>
                                     <span class="badge bg-success badge-detail">
                                         <i class="ti ti-calendar"></i> <?= $usia ?> Tahun
+                                    </span>
+                                    <span class="badge <?= getStatusTinggalBadgeColor($data['STATUS_TINGGAL']) ?> badge-detail">
+                                        <i class="ti ti-<?= $data['STATUS_TINGGAL'] == 'MENINGGAL' ? 'grave' : ($data['STATUS_TINGGAL'] == 'PINDAH' ? 'map-pin' : 'home') ?>"></i>
+                                        <?= formatStatusTinggalLengkap($data['STATUS_TINGGAL']) ?>
                                     </span>
                                 </div>
                             </div>
@@ -278,7 +469,7 @@ function formatStatusTinggalLengkap($status)
                                                 <div class="col-sm-4 info-label">Tempat, Tanggal Lahir</div>
                                                 <div class="col-sm-8 info-value">
                                                     <?= htmlspecialchars($data['TMPT_LHR']) ?>,
-                                                    <?= date('d F Y', strtotime($data['TGL_LHR'])) ?>
+                                                    <?= formatTanggalIndo($data['TGL_LHR']) ?>
                                                     <small class="text-muted">(<?= $usia ?> tahun)</small>
                                                 </div>
                                             </div>
@@ -315,6 +506,11 @@ function formatStatusTinggalLengkap($status)
                                                     <span class="badge bg-primary">
                                                         <?= formatStatusKawinLengkap($data['STATUS_KAWIN']) ?>
                                                     </span>
+                                                    <?php if ($data['STATUS_KAWIN'] == 'KAWIN' && isset($dokumen_grup['BUKU_NIKAH'])): ?>
+                                                        <small class="text-success ms-2">
+                                                            <i class="ti ti-file-check"></i> Buku nikah terlampir
+                                                        </small>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
                                             <div class="row mb-2">
@@ -323,6 +519,24 @@ function formatStatusTinggalLengkap($status)
                                                     <span class="badge bg-secondary">
                                                         <?= formatHubKeluargaLengkap($data['HBKEL']) ?>
                                                     </span>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-sm-4 info-label">Status Tinggal</div>
+                                                <div class="col-sm-8 info-value">
+                                                    <span class="badge <?= getStatusTinggalBadgeColor($data['STATUS_TINGGAL']) ?>">
+                                                        <?= formatStatusTinggalLengkap($data['STATUS_TINGGAL']) ?>
+                                                    </span>
+                                                    <?php if ($data['STATUS_TINGGAL'] == 'MENINGGAL' && isset($dokumen_grup['AKTA_KEMATIAN'])): ?>
+                                                        <small class="text-success ms-2">
+                                                            <i class="ti ti-file-check"></i> Akta kematian terlampir
+                                                        </small>
+                                                    <?php endif; ?>
+                                                    <?php if ($data['STATUS_TINGGAL'] == 'PINDAH' && isset($dokumen_grup['AKTA_PINDAH'])): ?>
+                                                        <small class="text-success ms-2">
+                                                            <i class="ti ti-file-check"></i> Akta pindah terlampir
+                                                        </small>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
                                             <div class="row mb-2">
@@ -349,22 +563,14 @@ function formatStatusTinggalLengkap($status)
                                                         '<span class="text-muted">-</span>' ?>
                                                 </div>
                                             </div>
-                                            <div class="row mb-2">
+                                            <!-- <div class="row mb-2">
                                                 <div class="col-sm-4 info-label">Kewarganegaraan</div>
                                                 <div class="col-sm-8 info-value">
                                                     <span class="badge bg-<?= $data['KEWARGANEGARAAN'] == 'WNI' ? 'primary' : 'warning' ?>">
-                                                        <?= $data['KEWARGANEGARAAN'] ?>
+                                                        <?= $data['KEWARGANEGaraan'] ?>
                                                     </span>
                                                 </div>
-                                            </div>
-                                            <div class="row mb-2">
-                                                <div class="col-sm-4 info-label">Status Tinggal</div>
-                                                <div class="col-sm-8 info-value">
-                                                    <span class="badge bg-info">
-                                                        <?= formatStatusTinggalLengkap($data['STATUS_TINGGAL']) ?>
-                                                    </span>
-                                                </div>
-                                            </div>
+                                            </div> -->
                                         </div>
                                     </div>
                                 </div>
@@ -454,14 +660,14 @@ function formatStatusTinggalLengkap($status)
                                                     <strong>Data Input</strong><br>
                                                     <small class="text-muted">
                                                         <i class="ti ti-calendar"></i>
-                                                        <?= date('d F Y H:i', strtotime($data['created_at'])) ?>
+                                                        <?= formatTanggalWaktu($data['created_at']) ?>
                                                     </small>
                                                 </div>
                                                 <div class="timeline-item">
                                                     <strong>Data Update Terakhir</strong><br>
                                                     <small class="text-muted">
                                                         <i class="ti ti-refresh"></i>
-                                                        <?= date('d F Y H:i', strtotime($data['updated_at'])) ?>
+                                                        <?= formatTanggalWaktu($data['updated_at']) ?>
                                                     </small>
                                                 </div>
                                                 <div class="timeline-item">
@@ -474,8 +680,246 @@ function formatStatusTinggalLengkap($status)
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Dokumen Pendukung -->
+                                <div class="col-12 mb-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6 class="section-title mb-0">
+                                                <i class="ti ti-files"></i> Dokumen Pendukung
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- Buku Nikah -->
+                                            <?php if ($data['STATUS_KAWIN'] == 'KAWIN'): ?>
+                                                <h6 class="mb-3">
+                                                    <i class="ti ti-ring"></i> Dokumen Pernikahan
+                                                    <?php if (isset($dokumen_grup['BUKU_NIKAH'])): ?>
+                                                        <span class="badge bg-success ms-2">
+                                                            <?= count($dokumen_grup['BUKU_NIKAH']) ?> Dokumen
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-warning text-dark ms-2">
+                                                            Belum ada dokumen
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </h6>
+                                                <?php if (isset($dokumen_grup['BUKU_NIKAH'])): ?>
+                                                    <div class="row">
+                                                        <?php foreach ($dokumen_grup['BUKU_NIKAH'] as $dokumen): ?>
+                                                            <div class="col-md-6 col-lg-4">
+                                                                <div class="dokumen-card">
+                                                                    <div class="dokumen-header">
+                                                                        <span class="dokumen-badge">Buku Nikah</span>
+                                                                        <small class="text-muted">
+                                                                            <?= formatTanggalIndo($dokumen['tanggal_dokumen']) ?>
+                                                                        </small>
+                                                                    </div>
+                                                                    <?php if ($dokumen['nomor_dokumen']): ?>
+                                                                        <div class="dokumen-keterangan">
+                                                                            <strong>No. Dokumen:</strong> <?= htmlspecialchars($dokumen['nomor_dokumen']) ?>
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    <?php if ($dokumen['keterangan']): ?>
+                                                                        <div class="dokumen-keterangan">
+                                                                            <?= htmlspecialchars($dokumen['keterangan']) ?>
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                                                        <a href="<?= $base_url  . '/' . $dokumen['path'] ?>" target="_blank" class="file-link">
+                                                                            <i class="ti ti-eye"></i> Lihat Dokumen
+                                                                        </a>
+                                                                        <small class="text-muted">
+                                                                            <?= pathinfo($dokumen['original_name'], PATHINFO_EXTENSION) ?>
+                                                                        </small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="no-dokumen">
+                                                        <i class="ti ti-files-off"></i>
+                                                        <p class="mb-0">Belum ada dokumen buku nikah yang diupload</p>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <hr>
+                                            <?php endif; ?>
+
+                                            <!-- Akta Kematian -->
+                                            <?php if ($data['STATUS_TINGGAL'] == 'MENINGGAL'): ?>
+                                                <h6 class="mb-3">
+                                                    <i class="ti ti-grave"></i> Dokumen Kematian
+                                                    <?php if (isset($dokumen_grup['AKTA_KEMATIAN'])): ?>
+                                                        <span class="badge bg-success ms-2">
+                                                            <?= count($dokumen_grup['AKTA_KEMATIAN']) ?> Dokumen
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-warning text-dark ms-2">
+                                                            Belum ada dokumen
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </h6>
+                                                <?php if (isset($dokumen_grup['AKTA_KEMATIAN'])): ?>
+                                                    <div class="row">
+                                                        <?php foreach ($dokumen_grup['AKTA_KEMATIAN'] as $dokumen): ?>
+                                                            <div class="col-md-6 col-lg-4">
+                                                                <div class="dokumen-card">
+                                                                    <div class="dokumen-header">
+                                                                        <span class="dokumen-badge">Akta Kematian</span>
+                                                                        <small class="text-muted">
+                                                                            <?= formatTanggalIndo($dokumen['tanggal_dokumen']) ?>
+                                                                        </small>
+                                                                    </div>
+                                                                    <?php if ($dokumen['nomor_dokumen']): ?>
+                                                                        <div class="dokumen-keterangan">
+                                                                            <strong>No. Akta:</strong> <?= htmlspecialchars($dokumen['nomor_dokumen']) ?>
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                                                        <a href="<?= $base_url . '/' . $dokumen['path'] ?>" target="_blank" class="file-link">
+                                                                            <i class="ti ti-eye"></i> Lihat Dokumen
+                                                                        </a>
+                                                                        <small class="text-muted">
+                                                                            <?= pathinfo($dokumen['original_name'], PATHINFO_EXTENSION) ?>
+                                                                        </small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="no-dokumen">
+                                                        <i class="ti ti-files-off"></i>
+                                                        <p class="mb-0">Belum ada dokumen akta kematian yang diupload</p>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <hr>
+                                            <?php endif; ?>
+
+                                            <!-- Akta Pindah -->
+                                            <?php if ($data['STATUS_TINGGAL'] == 'PINDAH'): ?>
+                                                <h6 class="mb-3">
+                                                    <i class="ti ti-map-pin"></i> Dokumen Perpindahan
+                                                    <?php if (isset($dokumen_grup['AKTA_PINDAH'])): ?>
+                                                        <span class="badge bg-success ms-2">
+                                                            <?= count($dokumen_grup['AKTA_PINDAH']) ?> Dokumen
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-warning text-dark ms-2">
+                                                            Belum ada dokumen
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </h6>
+                                                <?php if (isset($dokumen_grup['AKTA_PINDAH'])): ?>
+                                                    <div class="row">
+                                                        <?php foreach ($dokumen_grup['AKTA_PINDAH'] as $dokumen): ?>
+                                                            <div class="col-md-6 col-lg-4">
+                                                                <div class="dokumen-card">
+                                                                    <div class="dokumen-header">
+                                                                        <span class="dokumen-badge">Akta Pindah</span>
+                                                                        <small class="text-muted">
+                                                                            <?= formatTanggalIndo($dokumen['tanggal_dokumen']) ?>
+                                                                        </small>
+                                                                    </div>
+                                                                    <?php if ($dokumen['nomor_dokumen']): ?>
+                                                                        <div class="dokumen-keterangan">
+                                                                            <strong>No. Dokumen:</strong> <?= htmlspecialchars($dokumen['nomor_dokumen']) ?>
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    <?php if ($dokumen['keterangan']): ?>
+                                                                        <div class="dokumen-keterangan">
+                                                                            <?= htmlspecialchars($dokumen['keterangan']) ?>
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                                                        <a href="<?= $base_url  . '/' . $dokumen['path'] ?>" target="_blank" class="file-link">
+                                                                            <i class="ti ti-eye"></i> Lihat Dokumen
+                                                                        </a>
+                                                                        <small class="text-muted">
+                                                                            <?= pathinfo($dokumen['original_name'], PATHINFO_EXTENSION) ?>
+                                                                        </small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="no-dokumen">
+                                                        <i class="ti ti-files-off"></i>
+                                                        <p class="mb-0">Belum ada dokumen akta pindah yang diupload</p>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <hr>
+                                            <?php endif; ?>
+
+                                            <!-- Dokumen Lainnya -->
+                                            <?php if (isset($dokumen_grup['LAINNYA'])): ?>
+                                                <h6 class="mb-3">
+                                                    <i class="ti ti-files"></i> Dokumen Lainnya
+                                                    <span class="badge bg-info ms-2">
+                                                        <?= count($dokumen_grup['LAINNYA']) ?> Dokumen
+                                                    </span>
+                                                </h6>
+                                                <div class="row">
+                                                    <?php foreach ($dokumen_grup['LAINNYA'] as $dokumen): ?>
+                                                        <div class="col-md-6 col-lg-4">
+                                                            <div class="dokumen-card">
+                                                                <div class="dokumen-header">
+                                                                    <span class="dokumen-badge">Lainnya</span>
+                                                                    <small class="text-muted">
+                                                                        <?= formatTanggalWaktu($dokumen['created_at']) ?>
+                                                                    </small>
+                                                                </div>
+                                                                <h6 class="mb-1"><?= htmlspecialchars($dokumen['original_name']) ?></h6>
+                                                                <?php if ($dokumen['keterangan']): ?>
+                                                                    <div class="dokumen-keterangan">
+                                                                        <?= htmlspecialchars($dokumen['keterangan']) ?>
+                                                                    </div>
+                                                                <?php endif; ?>
+                                                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                                                    <a href="<?= $base_url  . '/' . $dokumen['path'] ?>" target="_blank" class="file-link">
+                                                                        <i class="ti ti-eye"></i> Lihat Dokumen
+                                                                    </a>
+                                                                    <small class="text-muted">
+                                                                        <?= pathinfo($dokumen['original_name'], PATHINFO_EXTENSION) ?>
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            <?php endif; ?>
+
+                                            <!-- Tidak ada dokumen sama sekali -->
+                                            <?php if (empty($dokumen_list)): ?>
+                                                <div class="no-dokumen">
+                                                    <i class="ti ti-files-off"></i>
+                                                    <p class="mb-0">Tidak ada dokumen yang diupload</p>
+                                                    <small class="text-muted">Upload dokumen melalui menu edit data</small>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
+                            <!-- Tombol Aksi -->
+                            <div class="d-flex justify-content-between mt-4">
+                                <div>
+                                    <a href="list.php" class="btn btn-secondary">
+                                        <i class="ti ti-arrow-left"></i> Kembali ke Daftar
+                                    </a>
+                                </div>
+                                <div>
+                                    <a href="edit.php?id=<?= $id ?>" class="btn btn-primary">
+                                        <i class="ti ti-edit"></i> Edit Data
+                                    </a>
+                                    <a href="print_detail.php?id=<?= $id ?>" target="_blank" class="btn btn-info">
+                                        <i class="ti ti-printer"></i> Cetak
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -489,33 +933,6 @@ function formatStatusTinggalLengkap($status)
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Delete confirmation
-            const deleteBtn = document.querySelector('.delete-btn');
-            if (deleteBtn) {
-                deleteBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const id = this.getAttribute('data-id');
-                    const name = this.getAttribute('data-name');
-
-                    Swal.fire({
-                        title: 'Apakah Anda yakin?',
-                        text: `Anda akan menghapus data ${name}. Tindakan ini tidak dapat dibatalkan!`,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Ya, Hapus!',
-                        cancelButtonText: 'Batal',
-                        showLoaderOnConfirm: true,
-                        preConfirm: () => {
-                            return new Promise((resolve) => {
-                                window.location.href = `list.php?delete=${id}`;
-                            });
-                        }
-                    });
-                });
-            }
-
             // Print function
             function printDetail() {
                 const url = `print_detail.php?id=<?= $id ?>`;
@@ -524,6 +941,45 @@ function formatStatusTinggalLengkap($status)
                     printWindow.print();
                 };
             }
+
+            // Preview dokumen modal
+            function previewDokumen(url, title) {
+                const extension = url.split('.').pop().toLowerCase();
+
+                if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
+                    // Preview gambar
+                    Swal.fire({
+                        title: title,
+                        html: `<img src="${url}" class="img-fluid" alt="${title}">`,
+                        showCloseButton: true,
+                        showConfirmButton: false,
+                        width: '80%'
+                    });
+                } else if (extension === 'pdf') {
+                    // Preview PDF (membuka di tab baru karena Swal tidak support iframe dengan CORS)
+                    window.open(url, '_blank');
+                } else {
+                    // Dokumen lain, download saja
+                    window.open(url, '_blank');
+                }
+            }
+
+            // Add click event to all file-link for preview, but allow download if .download-link is clicked
+            document.querySelectorAll('.file-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Jika klik pada tombol download, jangan preventDefault
+                    if (e.target.classList.contains('download-link')) {
+                        // allow default download
+                        return;
+                    }
+                    e.preventDefault();
+                    const url = this.getAttribute('href');
+                    let title = '';
+                    const h6 = this.closest('.dokumen-card')?.querySelector('h6');
+                    if (h6) title = h6.textContent;
+                    previewDokumen(url, title);
+                });
+            });
 
             // Keyboard shortcuts
             document.addEventListener('keydown', function(e) {
@@ -536,6 +992,41 @@ function formatStatusTinggalLengkap($status)
                 if (e.key === 'Escape') {
                     window.location.href = 'list.php';
                 }
+                // Ctrl + E untuk edit
+                if (e.ctrlKey && e.key === 'e') {
+                    e.preventDefault();
+                    window.location.href = 'edit.php?id=<?= $id ?>';
+                }
+            });
+
+            // Copy NIK atau KK
+            function copyToClipboard(text, label) {
+                navigator.clipboard.writeText(text).then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: `${label} berhasil disalin!`,
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }).catch(err => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Gagal menyalin teks',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                });
+            }
+
+            // Add copy functionality to NIK and KK badges
+            document.querySelector('.badge-detail:nth-child(1)').addEventListener('click', function() {
+                copyToClipboard('<?= $data['NIK'] ?>', 'NIK');
+            });
+
+            document.querySelector('.badge-detail:nth-child(2)').addEventListener('click', function() {
+                copyToClipboard('<?= $data['NO_KK'] ?>', 'No. KK');
             });
         });
     </script>

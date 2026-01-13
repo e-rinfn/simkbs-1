@@ -1,3 +1,15 @@
+// Fungsi untuk label status tinggal
+function labelStatusTinggal($status) {
+switch (strtoupper($status)) {
+case 'MENINGGAL': return 'Meninggal';
+case 'PINDAH': return 'Pindah';
+case 'TETAP':
+case 'SEMENTARA':
+case 'PENDATANG':
+return 'Tinggal';
+default: return $status;
+}
+}
 <?php
 // export_pdf.php
 // Aktifkan error reporting
@@ -256,7 +268,9 @@ $pdf->SetFillColor(240, 240, 240);
 $pdf->SetFont('times', 'B', 9);
 
 // Set column widths yang lebih sederhana
-$col_widths = array(8, 28, 28, 40, 10, 10, 30, 20, 18, 45, 40);
+
+// Tambahkan kolom Status Tinggal
+$col_widths = array(8, 28, 28, 40, 10, 10, 25, 22, 23, 18, 30, 35);
 
 $headers = array(
     'No',
@@ -266,7 +280,8 @@ $headers = array(
     'JK',
     'Usia',
     'Tgl Lahir',
-    'Status',
+    'Status Kawin',
+    'Status Tinggal',
     'Agama',
     'Alamat',
     'Dusun'
@@ -346,18 +361,22 @@ foreach ($data as $row) {
     // Kolom 7: Tgl Lahir
     $pdf->Cell($col_widths[6], 6, $tgl_lahir_formatted, 1, 0, 'C');
 
-    // Kolom 8: Status (singkat)
-    $status = truncateStatusKawin($row['STATUS_KAWIN'] ?? '');
-    $pdf->Cell($col_widths[7], 6, $status, 1, 0, 'C');
 
-    // Kolom 9: Agama
-    $pdf->Cell($col_widths[8], 6, $agama, 1, 0, 'C');
+    // Kolom 8: Status Kawin (singkat)
+    $status_kawin = truncateStatusKawin($row['STATUS_KAWIN'] ?? '');
+    $pdf->Cell($col_widths[7], 6, $status_kawin, 1, 0, 'C');
 
-    // Kolom 10: Alamat
-    $pdf->Cell($col_widths[9], 6, $alamat, 1, 0, 'L');
+    // Kolom 9: Status Tinggal (label ramah)
+    $pdf->Cell($col_widths[8], 6, ($row['STATUS_TINGGAL'] ?? ''), 1, 0, 'C');
 
-    // Kolom 11: Dusun
-    $pdf->Cell($col_widths[10], 6, $row['nama_dusun'] ?? '-', 1, 0, 'C');
+    // Kolom 10: Agama
+    $pdf->Cell($col_widths[9], 6, $agama, 1, 0, 'C');
+
+    // Kolom 11: Alamat
+    $pdf->Cell($col_widths[10], 6, $alamat, 1, 0, 'L');
+
+    // Kolom 12: Dusun
+    $pdf->Cell($col_widths[11], 6, $row['nama_dusun'] ?? '-', 1, 0, 'C');
 
     $pdf->Ln();
 }

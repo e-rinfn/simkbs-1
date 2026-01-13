@@ -41,24 +41,18 @@ if (!$data) {
 $sql_dusun = "SELECT * FROM tabel_dusun ORDER BY dusun";
 $dusun_options = query($sql_dusun);
 
-// Ambil dokumen yang sudah diupload
-$sql_dokumen = "SELECT * FROM tabel_dokumen_penduduk WHERE penduduk_id = $id ORDER BY jenis_dokumen, created_at DESC";
-$dokumen_list = query($sql_dokumen);
-
 // Data untuk dropdown
 $agama_options = ['ISLAM', 'KRISTEN', 'KATOLIK', 'HINDU', 'BUDDHA', 'KONGHUCU', 'LAINNYA'];
 $hubungan_options = ['KEPALA KELUARGA', 'ISTRI', 'ANAK', 'FAMILI LAIN'];
 $pendidikan_options = ['TIDAK/BELUM SEKOLAH', 'SD/SEDERAJAT', 'SMP/SEDERAJAT', 'SMA/SEDERAJAT', 'D1/D2/D3', 'S1', 'S2', 'S3'];
 $kewarganegaraan_options = ['WNI', 'WNA'];
-$status_tinggal_options = ['TETAP', 'SEMENTARA', 'PENDATANG', 'MENINGGAL', 'PINDAH'];
+$status_tinggal_options = ['TETAP', 'SEMENTARA', 'PENDATANG'];
 $gol_darah_options = ['A', 'B', 'AB', 'O', 'TIDAK TAHU'];
 $disabilitas_options = ['YA', 'TIDAK'];
 $status_kawin_options = ['BELUM KAWIN', 'KAWIN', 'CERAI HIDUP', 'CERAI MATI'];
-$jenis_dokumen_options = ['AKTA_KEMATIAN' => 'Akta Kematian', 'AKTA_PINDAH' => 'Akta Pindah', 'BUKU_NIKAH' => 'Buku Nikah', 'LAINNYA' => 'Lainnya'];
 
 $error = '';
 $success = '';
-$upload_errors = [];
 
 // Inisialisasi form_data dengan data dari database
 $form_data = [
@@ -88,79 +82,6 @@ $form_data = [
     'DISABILITAS' => $data['DISABILITAS'],
     'JENIS_DISABILITAS' => $data['JENIS_DISABILITAS'] ?? ''
 ];
-
-// Fungsi untuk upload file
-function uploadFile($file, $penduduk_id, $jenis_dokumen)
-{
-    global $conn, $upload_errors;
-
-    $allowed_extensions = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'doc', 'docx'];
-    $max_file_size = 5 * 1024 * 1024; // 5MB
-
-    $original_name = basename($file['name']);
-    $file_extension = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
-    $file_size = $file['size'];
-
-    // Validasi ekstensi file
-    if (!in_array($file_extension, $allowed_extensions)) {
-        $upload_errors[] = "Ekstensi file tidak diperbolehkan. Hanya PDF, JPG, PNG, GIF, DOC, DOCX.";
-        return false;
-    }
-
-    // Validasi ukuran file
-    if ($file_size > $max_file_size) {
-        $upload_errors[] = "Ukuran file terlalu besar. Maksimal 5MB.";
-        return false;
-    }
-
-    // Generate unique filename
-    $new_filename = 'doc_' . $penduduk_id . '_' . $jenis_dokumen . '_' . time() . '.' . $file_extension;
-    $upload_path = __DIR__ . '/../../uploads/dokumen_penduduk/';
-
-    // Create directory if not exists
-    if (!is_dir($upload_path)) {
-        mkdir($upload_path, 0755, true);
-    }
-
-    $target_file = $upload_path . $new_filename;
-
-    // Upload file
-    if (move_uploaded_file($file['tmp_name'], $target_file)) {
-        // Generate nomor dokumen jika kosong
-        $nomor_dokumen = $_POST['nomor_dokumen'][$jenis_dokumen] ?? '';
-        $tanggal_dokumen = $_POST['tanggal_dokumen'][$jenis_dokumen] ?? null;
-        $keterangan = $_POST['keterangan'][$jenis_dokumen] ?? '';
-
-        // Simpan ke database
-        $sql = "INSERT INTO tabel_dokumen_penduduk 
-                (penduduk_id, jenis_dokumen, nama_file, original_name, path, nomor_dokumen, tanggal_dokumen, keterangan) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-        $stmt = $conn->prepare($sql);
-        $relative_path = 'uploads/dokumen_penduduk/' . $new_filename;
-        $stmt->bind_param(
-            "isssssss",
-            $penduduk_id,
-            $jenis_dokumen,
-            $new_filename,
-            $original_name,
-            $relative_path,
-            $nomor_dokumen,
-            $tanggal_dokumen,
-            $keterangan
-        );
-
-        if ($stmt->execute()) {
-            return true;
-        } else {
-            $upload_errors[] = "Gagal menyimpan data dokumen: " . $stmt->error;
-            return false;
-        }
-    } else {
-        $upload_errors[] = "Gagal mengupload file.";
-        return false;
-    }
-}
 
 // Jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -245,31 +166,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 WHERE id = $id";
 
         if ($conn->query($sql)) {
-            // Handle file uploads
-            if ($STATUS_KAWIN === 'KAWIN' && isset($_FILES['buku_nikah']) && $_FILES['buku_nikah']['error'] != 4) {
-                uploadFile($_FILES['buku_nikah'], $id, 'BUKU_NIKAH');
-            }
-
-            if ($STATUS_TINGGAL === 'MENINGGAL' && isset($_FILES['akta_kematian']) && $_FILES['akta_kematian']['error'] != 4) {
-                uploadFile($_FILES['akta_kematian'], $id, 'AKTA_KEMATIAN');
-            }
-
-            if ($STATUS_TINGGAL === 'PINDAH' && isset($_FILES['akta_pindah']) && $_FILES['akta_pindah']['error'] != 4) {
-                uploadFile($_FILES['akta_pindah'], $id, 'AKTA_PINDAH');
-            }
-
-            // Handle dokumen lainnya
-            if (isset($_FILES['dokumen_lainnya']) && $_FILES['dokumen_lainnya']['error'] != 4) {
-                uploadFile($_FILES['dokumen_lainnya'], $id, 'LAINNYA');
-            }
-
-            if (!empty($upload_errors)) {
-                $error = "Data berhasil disimpan, tetapi ada masalah dengan upload dokumen: " . implode(', ', $upload_errors);
-            } else {
-                $_SESSION['success'] = "Data penduduk berhasil diperbarui!";
-                header("Location: list.php");
-                exit();
-            }
+            $_SESSION['success'] = "Data penduduk berhasil diperbarui!";
+            header("Location: list.php");
+            exit();
         } else {
             throw new Exception("Gagal memperbarui data: " . $conn->error);
         }
@@ -345,67 +244,6 @@ $usia = $today->diff($tgl_lahir)->y;
             color: #0d6efd;
             margin-bottom: 10px;
         }
-
-        .dokumen-card {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background-color: #fff;
-        }
-
-        .dokumen-card .dokumen-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .dokumen-badge {
-            background-color: #0d6efd;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
-        }
-
-        .file-preview {
-            max-width: 200px;
-            max-height: 200px;
-            margin-top: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 5px;
-        }
-
-        .file-link {
-            display: inline-block;
-            margin-top: 5px;
-            padding: 5px 10px;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            text-decoration: none;
-            color: #0d6efd;
-        }
-
-        .file-link:hover {
-            background-color: #e9ecef;
-        }
-
-        .delete-dokumen {
-            color: #dc3545;
-            cursor: pointer;
-            font-size: 1.2em;
-        }
-
-        .conditional-upload {
-            display: none;
-        }
-
-        .conditional-upload.show {
-            display: block;
-        }
     </style>
 </head>
 
@@ -460,14 +298,7 @@ $usia = $today->diff($tgl_lahir)->y;
                                 </div>
                             <?php endif; ?>
 
-                            <?php if ($success): ?>
-                                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    <strong>Berhasil!</strong> <?= htmlspecialchars($success); ?>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            <?php endif; ?>
-
-                            <form method="post" id="formEditPenduduk" enctype="multipart/form-data">
+                            <form method="post" id="formEditPenduduk">
                                 <div class="row">
                                     <!-- Data Pribadi -->
                                     <div class="col-md-12">
@@ -565,18 +396,6 @@ $usia = $today->diff($tgl_lahir)->y;
                                                     </select>
                                                 </div>
 
-                                                <div class="col-md-4 mb-3 conditional-upload" id="upload_buku_nikah">
-                                                    <label for="buku_nikah" class="form-label">Upload Buku Nikah</label>
-                                                    <input type="file" id="buku_nikah" name="buku_nikah" class="form-control"
-                                                        accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx">
-                                                    <small class="text-muted">Format: PDF, JPG, PNG, GIF, DOC, DOCX (Max 5MB)</small>
-                                                    <div class="mt-2">
-                                                        <label for="nomor_dokumen[BUKU_NIKAH]" class="form-label small">Nomor Buku Nikah</label>
-                                                        <input type="text" id="nomor_dokumen[BUKU_NIKAH]" name="nomor_dokumen[BUKU_NIKAH]"
-                                                            class="form-control form-control-sm">
-                                                    </div>
-                                                </div>
-
                                                 <div class="col-md-4 mb-3">
                                                     <label for="PENDIDIKAN" class="form-label">Pendidikan Terakhir</label>
                                                     <select id="PENDIDIKAN" name="PENDIDIKAN" class="form-select">
@@ -589,13 +408,13 @@ $usia = $today->diff($tgl_lahir)->y;
                                                     </select>
                                                 </div>
 
-                                                <div class="col-md-4 mb-3">
+                                                <div class="col-md-6 mb-3">
                                                     <label for="PEKERJAAN" class="form-label">Pekerjaan</label>
                                                     <input type="text" id="PEKERJAAN" name="PEKERJAAN" class="form-control"
                                                         value="<?= htmlspecialchars($form_data['PEKERJAAN']) ?>">
                                                 </div>
 
-                                                <div class="col-md-2 mb-3">
+                                                <div class="col-md-3 mb-3">
                                                     <label for="KEWARGANEGARAAN" class="form-label form-required">Kewarganegaraan</label>
                                                     <select id="KEWARGANEGARAAN" name="KEWARGANEGARAAN" class="form-select" required>
                                                         <?php foreach ($kewarganegaraan_options as $kwn): ?>
@@ -606,7 +425,7 @@ $usia = $today->diff($tgl_lahir)->y;
                                                     </select>
                                                 </div>
 
-                                                <div class="col-md-2 mb-3">
+                                                <div class="col-md-3 mb-3">
                                                     <label for="STATUS_TINGGAL" class="form-label form-required">Status Tinggal</label>
                                                     <select id="STATUS_TINGGAL" name="STATUS_TINGGAL" class="form-select" required>
                                                         <?php foreach ($status_tinggal_options as $status): ?>
@@ -615,85 +434,6 @@ $usia = $today->diff($tgl_lahir)->y;
                                                             </option>
                                                         <?php endforeach; ?>
                                                     </select>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3 conditional-upload" id="upload_akta_kematian">
-                                                    <label for="akta_kematian" class="form-label">Upload Akta Kematian</label>
-                                                    <input type="file" id="akta_kematian" name="akta_kematian" class="form-control"
-                                                        accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx">
-                                                    <small class="text-muted">Format: PDF, JPG, PNG, GIF, DOC, DOCX (Max 5MB)</small>
-                                                    <div class="mt-2">
-                                                        <label for="tanggal_dokumen[AKTA_KEMATIAN]" class="form-label small">Tanggal Kematian</label>
-                                                        <input type="date" id="tanggal_dokumen[AKTA_KEMATIAN]" name="tanggal_dokumen[AKTA_KEMATIAN]"
-                                                            class="form-control form-control-sm">
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3 conditional-upload" id="upload_akta_pindah">
-                                                    <label for="akta_pindah" class="form-label">Upload Akta Pindah</label>
-                                                    <input type="file" id="akta_pindah" name="akta_pindah" class="form-control"
-                                                        accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx">
-                                                    <small class="text-muted">Format: PDF, JPG, PNG, GIF, DOC, DOCX (Max 5MB)</small>
-                                                    <div class="mt-2">
-                                                        <label for="tanggal_dokumen[AKTA_PINDAH]" class="form-label small">Tanggal Pindah</label>
-                                                        <input type="date" id="tanggal_dokumen[AKTA_PINDAH]" name="tanggal_dokumen[AKTA_PINDAH]"
-                                                            class="form-control form-control-sm">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Dokumen yang sudah diupload -->
-                                    <?php if (!empty($dokumen_list)): ?>
-                                        <div class="col-md-12">
-                                            <div class="form-section">
-                                                <h5><i class="ti ti-files"></i> Dokumen Terlampir</h5>
-                                                <div class="row">
-                                                    <?php foreach ($dokumen_list as $dokumen): ?>
-                                                        <div class="col-md-6">
-                                                            <div class="dokumen-card">
-                                                                <div class="dokumen-header">
-                                                                    <div>
-                                                                        <span class="dokumen-badge"><?= $jenis_dokumen_options[$dokumen['jenis_dokumen']] ?></span>
-                                                                        <h6 class="mt-2 mb-0"><?= htmlspecialchars($dokumen['original_name']) ?></h6>
-                                                                    </div>
-                                                                    <a href="#" class="delete-dokumen" onclick="deleteDokumen(<?= $dokumen['id'] ?>)">
-                                                                        <i class="ti ti-trash"></i>
-                                                                    </a>
-                                                                </div>
-                                                                <?php if ($dokumen['nomor_dokumen']): ?>
-                                                                    <p class="mb-1"><small>No. Dokumen: <?= htmlspecialchars($dokumen['nomor_dokumen']) ?></small></p>
-                                                                <?php endif; ?>
-                                                                <?php if ($dokumen['tanggal_dokumen']): ?>
-                                                                    <p class="mb-1"><small>Tanggal: <?= $dokumen['tanggal_dokumen'] ?></small></p>
-                                                                <?php endif; ?>
-                                                                <a href="<?= $base_url . $dokumen['path'] ?>" target="_blank" class="file-link">
-                                                                    <i class="ti ti-download"></i> Download
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    <?php endforeach; ?>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <!-- Dokumen Lainnya -->
-                                    <div class="col-md-12">
-                                        <div class="form-section">
-                                            <h5><i class="ti ti-upload"></i> Dokumen Lainnya</h5>
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="dokumen_lainnya" class="form-label">Upload Dokumen Lainnya</label>
-                                                    <input type="file" id="dokumen_lainnya" name="dokumen_lainnya" class="form-control"
-                                                        accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx">
-                                                    <small class="text-muted">Format: PDF, JPG, PNG, GIF, DOC, DOCX (Max 5MB)</small>
-                                                    <div class="mt-2">
-                                                        <label for="keterangan[LAINNYA]" class="form-label small">Keterangan</label>
-                                                        <input type="text" id="keterangan[LAINNYA]" name="keterangan[LAINNYA]"
-                                                            class="form-control form-control-sm" placeholder="Keterangan dokumen">
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -860,45 +600,12 @@ $usia = $today->diff($tgl_lahir)->y;
                 }
             }
 
-            // Handle conditional fields for status tinggal dan kawin
-            const statusKawinSelect = document.getElementById('STATUS_KAWIN');
-            const statusTinggalSelect = document.getElementById('STATUS_TINGGAL');
-            const uploadBukuNikah = document.getElementById('upload_buku_nikah');
-            const uploadAktaKematian = document.getElementById('upload_akta_kematian');
-            const uploadAktaPindah = document.getElementById('upload_akta_pindah');
-
-            function toggleUploadFields() {
-                // Toggle buku nikah
-                if (statusKawinSelect.value === 'KAWIN') {
-                    uploadBukuNikah.classList.add('show');
-                } else {
-                    uploadBukuNikah.classList.remove('show');
-                }
-
-                // Toggle akta kematian
-                if (statusTinggalSelect.value === 'MENINGGAL') {
-                    uploadAktaKematian.classList.add('show');
-                } else {
-                    uploadAktaKematian.classList.remove('show');
-                }
-
-                // Toggle akta pindah
-                if (statusTinggalSelect.value === 'PINDAH') {
-                    uploadAktaPindah.classList.add('show');
-                } else {
-                    uploadAktaPindah.classList.remove('show');
-                }
-            }
-
             // Initial toggle
             toggleDisabilitasField();
-            toggleUploadFields();
 
             // Add event listeners
             disabilitasYa.addEventListener('change', toggleDisabilitasField);
             disabilitasTidak.addEventListener('change', toggleDisabilitasField);
-            statusKawinSelect.addEventListener('change', toggleUploadFields);
-            statusTinggalSelect.addEventListener('change', toggleUploadFields);
 
             // Format input numbers for NIK and KK
             function formatNumberInput(input) {
@@ -972,93 +679,11 @@ $usia = $today->diff($tgl_lahir)->y;
                 }
             });
 
-            // Validate file size
-            function validateFileSize(fileInput, maxSizeMB) {
-                if (fileInput.files.length > 0) {
-                    const fileSize = fileInput.files[0].size;
-                    const maxSize = maxSizeMB * 1024 * 1024;
-
-                    if (fileSize > maxSize) {
-                        alert(`Ukuran file terlalu besar. Maksimal ${maxSizeMB}MB.`);
-                        fileInput.value = '';
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            // Add file validation
-            document.getElementById('buku_nikah')?.addEventListener('change', function() {
-                validateFileSize(this, 5);
-            });
-
-            document.getElementById('akta_kematian')?.addEventListener('change', function() {
-                validateFileSize(this, 5);
-            });
-
-            document.getElementById('akta_pindah')?.addEventListener('change', function() {
-                validateFileSize(this, 5);
-            });
-
-            document.getElementById('dokumen_lainnya')?.addEventListener('change', function() {
-                validateFileSize(this, 5);
-            });
-
             // Check if there's an error and scroll to it
             <?php if ($error): ?>
                 window.scrollTo(0, 0);
             <?php endif; ?>
         });
-
-        // Function to delete dokumen
-        function deleteDokumen(dokumenId) {
-            Swal.fire({
-                title: 'Hapus Dokumen?',
-                text: 'Dokumen akan dihapus secara permanen!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // AJAX request to delete dokumen
-                    fetch('delete_dokumen.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: `dokumen_id=${dokumenId}&penduduk_id=<?= $id ?>`
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire(
-                                    'Terhapus!',
-                                    'Dokumen berhasil dihapus.',
-                                    'success'
-                                ).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire(
-                                    'Gagal!',
-                                    data.message || 'Gagal menghapus dokumen.',
-                                    'error'
-                                );
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire(
-                                'Error!',
-                                'Terjadi kesalahan saat menghapus dokumen.',
-                                'error'
-                            );
-                        });
-                }
-            });
-        }
 
         // Confirm form reset
         function confirmReset() {
@@ -1108,44 +733,6 @@ $usia = $today->diff($tgl_lahir)->y;
                 alert('No. KK harus 16 digit angka');
                 document.getElementById('NO_KK').focus();
                 return false;
-            }
-
-            // Validate file sizes
-            const bukuNikah = document.getElementById('buku_nikah');
-            const aktaKematian = document.getElementById('akta_kematian');
-            const aktaPindah = document.getElementById('akta_pindah');
-            const dokumenLainnya = document.getElementById('dokumen_lainnya');
-
-            if (bukuNikah && bukuNikah.files.length > 0) {
-                if (bukuNikah.files[0].size > 5 * 1024 * 1024) {
-                    e.preventDefault();
-                    alert('Ukuran file Buku Nikah maksimal 5MB');
-                    return false;
-                }
-            }
-
-            if (aktaKematian && aktaKematian.files.length > 0) {
-                if (aktaKematian.files[0].size > 5 * 1024 * 1024) {
-                    e.preventDefault();
-                    alert('Ukuran file Akta Kematian maksimal 5MB');
-                    return false;
-                }
-            }
-
-            if (aktaPindah && aktaPindah.files.length > 0) {
-                if (aktaPindah.files[0].size > 5 * 1024 * 1024) {
-                    e.preventDefault();
-                    alert('Ukuran file Akta Pindah maksimal 5MB');
-                    return false;
-                }
-            }
-
-            if (dokumenLainnya && dokumenLainnya.files.length > 0) {
-                if (dokumenLainnya.files[0].size > 5 * 1024 * 1024) {
-                    e.preventDefault();
-                    alert('Ukuran file Dokumen Lainnya maksimal 5MB');
-                    return false;
-                }
             }
 
             // Check required fields
