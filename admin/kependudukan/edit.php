@@ -649,16 +649,16 @@ $usia = $today->diff($tgl_lahir)->y;
                                         <div class="col-md-12">
                                             <div class="form-section">
                                                 <h5><i class="ti ti-files"></i> Dokumen Terlampir</h5>
-                                                <div class="row">
+                                                <div class="row" id="dokumen-container">
                                                     <?php foreach ($dokumen_list as $dokumen): ?>
-                                                        <div class="col-md-6">
+                                                        <div class="col-md-6 dokumen-item" data-id="<?= $dokumen['id'] ?>">
                                                             <div class="dokumen-card">
                                                                 <div class="dokumen-header">
                                                                     <div>
                                                                         <span class="dokumen-badge"><?= $jenis_dokumen_options[$dokumen['jenis_dokumen']] ?></span>
                                                                         <h6 class="mt-2 mb-0"><?= htmlspecialchars($dokumen['original_name']) ?></h6>
                                                                     </div>
-                                                                    <a href="#" class="delete-dokumen" onclick="deleteDokumen(<?= $dokumen['id'] ?>)">
+                                                                    <a href="#" class="delete-dokumen" onclick="deleteDokumen(<?= $dokumen['id'] ?>, this)">
                                                                         <i class="ti ti-trash"></i>
                                                                     </a>
                                                                 </div>
@@ -668,8 +668,8 @@ $usia = $today->diff($tgl_lahir)->y;
                                                                 <?php if ($dokumen['tanggal_dokumen']): ?>
                                                                     <p class="mb-1"><small>Tanggal: <?= $dokumen['tanggal_dokumen'] ?></small></p>
                                                                 <?php endif; ?>
-                                                                <a href="<?= $base_url . $dokumen['path'] ?>" target="_blank" class="file-link">
-                                                                    <i class="ti ti-download"></i> Download
+                                                                <a href="<?= $base_url . '/' . $dokumen['path'] ?>" target="_blank" class="file-link">
+                                                                    <i class="ti ti-eye"></i> Lihat Dokumen
                                                                 </a>
                                                             </div>
                                                         </div>
@@ -845,8 +845,22 @@ $usia = $today->diff($tgl_lahir)->y;
     <?php include_once '../includes/footer.php'; ?>
     <?php include_once '../includes/js.php'; ?>
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+            // Event delegation for delete buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.delete-dokumen')) {
+                    e.preventDefault();
+                    const deleteBtn = e.target.closest('.delete-dokumen');
+                    const dokumenId = deleteBtn.closest('.dokumen-item').dataset.id;
+                    deleteDokumen(dokumenId, deleteBtn);
+                }
+            });
+
             // Handle conditional fields for disabilitas
             const disabilitasYa = document.getElementById('disabilitas_ya');
             const disabilitasTidak = document.getElementById('disabilitas_tidak');
@@ -1010,8 +1024,8 @@ $usia = $today->diff($tgl_lahir)->y;
             <?php endif; ?>
         });
 
-        // Function to delete dokumen
-        function deleteDokumen(dokumenId) {
+        // Function to delete dokumen - global function
+        window.deleteDokumen = function(dokumenId, element) {
             Swal.fire({
                 title: 'Hapus Dokumen?',
                 text: 'Dokumen akan dihapus secara permanen!',
@@ -1023,24 +1037,50 @@ $usia = $today->diff($tgl_lahir)->y;
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // AJAX request to delete dokumen
+                    // Show loading
+                    Swal.fire({
+                        title: 'Menghapus...',
+                        text: 'Mohon tunggu',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // AJAX request
+                    const formData = new FormData();
+                    formData.append('dokumen_id', dokumenId);
+                    formData.append('penduduk_id', <?= $id ?>);
+
                     fetch('delete_dokumen.php', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: `dokumen_id=${dokumenId}&penduduk_id=<?= $id ?>`
+                            body: formData
                         })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
                         .then(data => {
+                            Swal.close();
                             if (data.success) {
-                                Swal.fire(
-                                    'Terhapus!',
-                                    'Dokumen berhasil dihapus.',
-                                    'success'
-                                ).then(() => {
-                                    location.reload();
-                                });
+                                const card = element.closest('.dokumen-item');
+                                card.classList.add('fade-out');
+
+                                setTimeout(() => {
+                                    card.remove();
+                                    Swal.fire(
+                                        'Berhasil!',
+                                        'Dokumen telah dihapus.',
+                                        'success'
+                                    );
+
+                                    // Reload page if no documents left
+                                    if (document.querySelectorAll('.dokumen-item').length === 0) {
+                                        setTimeout(() => location.reload(), 1500);
+                                    }
+                                }, 500);
                             } else {
                                 Swal.fire(
                                     'Gagal!',
@@ -1050,6 +1090,7 @@ $usia = $today->diff($tgl_lahir)->y;
                             }
                         })
                         .catch(error => {
+                            console.error('Error:', error);
                             Swal.fire(
                                 'Error!',
                                 'Terjadi kesalahan saat menghapus dokumen.',
@@ -1058,7 +1099,10 @@ $usia = $today->diff($tgl_lahir)->y;
                         });
                 }
             });
-        }
+
+            // Prevent default
+            return false;
+        };
 
         // Confirm form reset
         function confirmReset() {
