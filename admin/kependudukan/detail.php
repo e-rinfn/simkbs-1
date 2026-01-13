@@ -1,9 +1,5 @@
 <?php
 
-// Aktifkan error reporting
-error_reporting(error_level: E_ALL);
-ini_set('display_errors', 1);
-
 // view.php
 include_once __DIR__ . '/../../config/config.php';
 require_once '../includes/header.php';
@@ -184,7 +180,7 @@ function formatUkuranFile($bytes)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Data Penduduk</title>
-    <?php include_once '../includes/css.php'; ?>
+    <!-- <?php include_once '../includes/css.php'; ?> -->
     <style>
         .card-detail {
             border-radius: 10px;
@@ -934,7 +930,7 @@ function formatUkuranFile($bytes)
     <!-- [ Main Content ] end -->
 
     <?php include_once '../includes/footer.php'; ?>
-    <?php include_once '../includes/js.php'; ?>
+    <!-- <?php include_once '../includes/js.php'; ?> -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
