@@ -1,4 +1,9 @@
 <?php
+
+// Aktifkan error reporting
+error_reporting(error_level: E_ALL);
+ini_set('display_errors', 1);
+
 // view.php
 include_once __DIR__ . '/../../config/config.php';
 require_once '../includes/header.php';
