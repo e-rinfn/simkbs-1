@@ -124,13 +124,27 @@ function uploadFile($file, $penduduk_id, $jenis_dokumen)
 
     $target_file = $upload_path . $new_filename;
 
+    // Ambil data dokumen
+    $nomor_dokumen = $_POST['nomor_dokumen'][$jenis_dokumen] ?? '';
+    $tanggal_dokumen = $_POST['tanggal_dokumen'][$jenis_dokumen] ?? null;
+    $keterangan = $_POST['keterangan'][$jenis_dokumen] ?? '';
+
+    // Validasi tanggal dokumen wajib untuk akta kematian dan akta pindah
+    if (in_array($jenis_dokumen, ['AKTA_KEMATIAN', 'AKTA_PINDAH'])) {
+        if (empty($tanggal_dokumen)) {
+            if ($jenis_dokumen === 'AKTA_KEMATIAN') {
+                $upload_errors[] = "Mohon isi tanggal kematian.";
+            } else if ($jenis_dokumen === 'AKTA_PINDAH') {
+                $upload_errors[] = "Mohon isi tanggal pindah.";
+            } else {
+                $upload_errors[] = "Mohon isi tanggal dokumen.";
+            }
+            return false;
+        }
+    }
+
     // Upload file
     if (move_uploaded_file($file['tmp_name'], $target_file)) {
-        // Generate nomor dokumen jika kosong
-        $nomor_dokumen = $_POST['nomor_dokumen'][$jenis_dokumen] ?? '';
-        $tanggal_dokumen = $_POST['tanggal_dokumen'][$jenis_dokumen] ?? null;
-        $keterangan = $_POST['keterangan'][$jenis_dokumen] ?? '';
-
         // Simpan ke database
         $sql = "INSERT INTO tabel_dokumen_penduduk 
                 (penduduk_id, jenis_dokumen, nama_file, original_name, path, nomor_dokumen, tanggal_dokumen, keterangan) 
@@ -264,7 +278,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if (!empty($upload_errors)) {
-                $error = "Data berhasil disimpan, tetapi ada masalah dengan upload dokumen: " . implode(', ', $upload_errors);
+                $error = "Terjadi Kesalahan. " . implode(', ', $upload_errors);
             } else {
                 $_SESSION['success'] = "Data penduduk berhasil diperbarui!";
                 header("Location: list.php");
